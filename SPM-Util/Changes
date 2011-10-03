@@ -1,0 +1,6 @@
+Revision history for Perl extension SPM::Util::Num.
+
+0.01  Fri Aug 26 22:11:53 2011
+	- original version; created by h2xs 1.23 with options
+		-Xn SPM::Util::Num
+

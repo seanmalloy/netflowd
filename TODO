@@ -1,0 +1,13 @@
+Read the following Perl docs:
+perlnewmod          Perl modules: preparing a new module for distribution
+
+TODO:
+* Should NetFlow::Data::new actually populate the data field of a flow
+  or should NetFlow::Parser::parse do it?
+* Create a stub for the class NetFlow::Data.
+* Finish the NetFlow::Parser::parse method.
+* Add additional type of exceptions to SPM::Exception.
+* Update SPM::Util::Num::bin2dec to throw updated exceptions
+* Write all documentation for NetFlow::Data, NetFlow::Parser, SPM::Util::Num,
+  SPM::Exception.
+# Write tests for all above listed modules.

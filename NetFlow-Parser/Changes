@@ -1,0 +1,6 @@
+Revision history for Perl extension NetFlow::Parser.
+
+0.01  Sat Aug 13 13:25:18 2011
+	- original version; created by h2xs 1.23 with options
+		-n NetFlow::Parser -X
+
