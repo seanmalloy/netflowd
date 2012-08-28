@@ -7,7 +7,7 @@ use SPM::Exception;
 require Exporter;
 
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw( bin2dec );
+our @EXPORT_OK = qw( bin2dec bin2dottedquad);
 our $VERSION   = '0.01';
 
 # Convert a number from binary to decimal.
@@ -37,6 +37,26 @@ sub dec2bin {
     # TODO: stub function
     my $num = shift;
     return(sprintf("%b", $num));
+}
+
+# Convert a 32 bit IPv4 address to dotted quad notation.
+sub bin2dottedquad {
+    my $ipv4 = shift;
+
+    if (!defined $ipv4) {
+        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+    }
+
+    if (length($ipv4) != 32) {
+        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+    }
+    # References are invalid input.
+    if (ref($ipv4) ne '') {
+        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+    }
+    my ($part1, $part2, $part3, $part4) = unpack "A8A8A8A8", $ipv4;
+    return(bin2dec($part1) . '.' . bin2dec($part2) . '.' . bin2dec($part3) .
+        '.' . bin2dec($part4));
 }
 
 1;

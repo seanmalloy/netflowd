@@ -3,7 +3,7 @@ package NetFlow::Parser;
 use 5.010001;
 use strict;
 use warnings;
-use SPM::Util::Num qw(bin2dec);
+use SPM::Util::Num qw(bin2dec bin2dottedquad);
 use NetFlow::Data;
 our $VERSION = '0.01';
 
@@ -44,48 +44,73 @@ sub input {
 }
 
 # START: finish the parse method.
-# returns: NetFlow::Data object. undef when there are no more
+# returns: NetFlow::Data object. undef or empty list when there are no more
 # flows to parse.
 sub parse {
+    warn "################### START parse";
     my $self = shift;
     if ($self->{flows_remaining} == 0) {
         warn("no flows remaining");
-        return undef;
+        return;
     }
-    warn("Flows: " . $self->{raw_packet});
-    return;
 
     # TODO: Below code needs work.
-    #my $offset = 0;    
-    #for (1..$self->{count}) {
-    #    #my $flow = substr($self->{raw_packet}, $offset, 96); # 96 = number of nybles in a flow record.
-    #    my ($srcaddr, $dstaddr, $nexthop,  $input,    $output, $dpkts,     $doctets,
-    #        $first,    $last,    $srcport,  $dstport,  $pad1,   $tcp_flags, $prot, $tos,
-    #        $src_as,  $dst_as,  $src_mask, $dst_mask, $pad2) =
-    #        unpack('A8A8A8A4A4A8A8A8A8A4A4A2A2A2A2A4A4A2A2A4', $flow);
-    #    print "Source Addr: $srcaddr\n";
-    #    print "Dest Addr: $dstaddr\n";
-    #    print "Next Hop: $nexthop\n";
-    #    print "Input: $input\n";
-    #    print "Output: $output\n";
-    #    print "Dpkts: $dpkts\n";
-    #    print "Octects: $doctets\n";
-    #    print "First: $first\n";
-    #    print "Last: $last\n";
-    #    print "Source Port: $srcport\n";
-    #    print "Dest Port: $dstport\n";
-    #    print "Pad1: $pad1\n";
-    #    print "TCP Flags: $tcp_flags\n";
-    #    print "Prot: $prot\n";
-    #    print "TOS: $tos\n";
-    #    print "Source AS: $src_as\n";
-    #    print "Dest AS: $dst_as\n";
-    #    print "Source mask: $src_mask\n";
-    #    print "Dest mask: $dst_mask\n";
-    #    print "Pad2: $pad2\n";
-    #    print "\n";
-    #    $offset += 96;
-    #}
+    my $offset = 0;    
+    for (1..$self->{count}) {
+        my $flow = substr($self->{raw_packet}, $offset, 384); # 384 = number of bits in a flow record
+        warn "Length of Flow Data: " . length($flow);
+        my ($srcaddr, $dstaddr, $nexthop,  $input,    $output, $dpkts,     $doctets,
+            $first,    $last,    $srcport,  $dstport,  $pad1,   $tcp_flags, $prot, $tos,
+            $src_as,  $dst_as,  $src_mask, $dst_mask, $pad2) =
+                unpack('A32A32A32A16A16A32A32A32A32A16A16A8A8A8A8A16A16A8A8A16', $flow);
+        # Convert Data
+        $srcaddr = bin2dottedquad($srcaddr);
+        $dstaddr = bin2dottedquad($dstaddr);
+        $nexthop = bin2dottedquad($nexthop);
+        $input   = bin2dec($input);
+        $output  = bin2dec($output);
+        $dpkts   = bin2dec($dpkts);
+        $doctets = bin2dec($doctets);
+        # TODO: convert first
+        # TODO: convert last
+        $srcport = bin2dec($srcport);
+        $dstport = bin2dec($dstport);
+        $pad1    = bin2dec($pad1);
+        # TODO: convert tcp_flags
+        $prot = bin2dec($prot);
+        # TODO: convert tos
+        # TODO: convert src_as
+        # TODO: convert dst_as
+        # TODO: convert src_mask
+        # TODO: convert dst_mask
+        $pad2 = bin2dec($pad2);
+        print "\n";
+        warn "Source Addr: $srcaddr";
+        warn "Dest Addr:   $dstaddr";
+        warn "Next Hop:    $nexthop";
+        warn "Input:       $input";
+        warn "Output:      $output";
+        warn "Dpkts:       $dpkts";
+        warn "Octects:     $doctets";
+        warn "First:       $first";
+        warn "Last:        $last";
+        warn "Source Port: $srcport";
+        warn "Dest Port:   $dstport";
+        warn "Pad1:        $pad1";
+        warn "TCP Flags:   $tcp_flags";
+        warn "Protocol:    $prot";
+        warn "TOS:         $tos";
+        warn "Source AS:   $src_as";
+        warn "Dest AS:     $dst_as";
+        warn "Source mask: $src_mask";
+        warn "Dest mask:   $dst_mask";
+        warn "Pad2:        $pad2";
+        print "\n";
+        $offset += 384;
+    }
+    my $random_data = substr($self->{raw_packet}, $offset); # TODO: removing this code
+    warn "Lenght of extra data: " . length($random_data);
+    warn "############################### end parse";
 }
 
 # input: none
@@ -98,8 +123,24 @@ sub remaining {
 sub _read_header {
     # TODO: unpack, handle network byte order(big endian vs. little endian)
     my $self = shift;
-    my ($version, $count, $sysuptime, $unix_secs, $unix_nsecs, $flow_sequence, $engine_type, $engine_id, $sampling_mode, $sampling_interval, $flows) =
-        unpack('n1n1N1N1N1N1H2H2B2B14B*', $self->{raw_packet}); # TODO - does it work on little and big endian machines?
+    my ($version,       $count,             $sysuptime,   $unix_secs,
+        $unix_nsecs,    $flow_sequence,     $engine_type, $engine_id,
+        $sampling_mode, $sampling_interval, $flows) =
+    #unpack('n1n1N1N1N1N1H2H2B2B14B*', $self->{raw_packet}); # TODO - does it work on little and big endian machines?
+            unpack('n1n1N1N1N1N1H2H2B2B6B*', $self->{raw_packet}); # TODO - why does this work
+
+    warn "Version: $version";
+    warn "Count: $count";
+    warn "Sysuptime: $sysuptime";
+    warn "Unix_Secs: $unix_secs";
+    warn "Unix NSencs: $unix_nsecs";
+    warn "Flow Seq: $flow_sequence";
+    warn "Engine Type: $engine_type";
+    warn "Engine ID: $engine_id";
+    warn "Sampling Mode: $sampling_mode";
+    warn "Sampleing Interval: $sampling_interval";
+    warn "Raw Flow Data Length(bits): " . length($flows);
+
     $self->{version}           = $version;
     $self->{count}             = $count;
     $self->{sys_uptime}        = $sysuptime;

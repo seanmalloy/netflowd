@@ -6,12 +6,17 @@ use warnings;
 use IO::Socket;
 use English;
 use NetFlow::Parser;
+use Getopt::Long;
 use Sys::Syslog;
 
-my $port_number = 1234;
-my $sock = new IO::Socket::INET( LocalPort => $port_number, Proto => 'udp' )
+my ($Port_Number);
+
+if (!defined $Port_Number) {
+    $Port_Number = 1234;
+}
+my $sock = new IO::Socket::INET( LocalPort => $Port_Number, Proto => 'udp' )
     or die "socket: $EVAL_ERROR";
-print "Waiting for UDP Packets on port $port_number\n";
+print "Waiting for UDP Packets on port $Port_Number\n";
 
 my ($MAXLEN, $data);
 # Maximum packet size for Netflow v5.
