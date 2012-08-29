@@ -1,9 +1,9 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl SPM-Util.t'
 
-use Test::More tests => 28;
+use Test::More tests => 31;
 use Test::Exception;
-use SPM::Util::Num qw( bin2dec bin2dottedquad );
+use SPM::Util::Num qw( bin2dec bin2dottedquad dec2bin);
 BEGIN { use_ok('SPM::Util::Num') };
 BEGIN { require_ok('SPM::Util::Num') };
 
@@ -20,7 +20,6 @@ is(bin2dec('0011'), 3, 'multiple leading zero convert 3');
 is(bin2dec(undef), 0, 'convert undef to zero');
 is(bin2dec(), 0, 'convert no input');
 
-# Test exception code.
 throws_ok { bin2dec('2') } "SPM::Exception", 'invalid input, 2';
 throws_ok { bin2dec('a') } "SPM::Exception", 'invalid input, a';
 throws_ok { bin2dec(my $ref = {}) } "SPM::Exception", 'invalid input, hash ref';
@@ -37,3 +36,8 @@ throws_ok { bin2dottedquad('1111111111111111111111111111111') } "SPM::Exception"
 throws_ok { bin2dottedquad('111111111111111111111111111111111') } "SPM::Exception", 'invalid input, 33 bits';
 throws_ok { bin2dottedquad(my $ref = {}) } "SPM::Exception", 'invalid input, hash ref';
 throws_ok { bin2dottedquad(my $ref = []) } "SPM::Exception", 'invalid input, array ref';
+
+is(dec2bin('7'), '00000000000000000000000000000111', 'convert 7(string) to binary');
+is(dec2bin(7), '00000000000000000000000000000111', 'convert 7 to binary');
+is(dec2bin(0), '00000000000000000000000000000000', 'convert 0 to binary');
+
