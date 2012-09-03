@@ -1,4 +1,4 @@
-# This Makefile is for the SPM::Util::Num extension to perl.
+# This Makefile is for the SPM::Util extension to perl.
 #
 # It was generated automatically by MakeMaker version
 # 6.55_02 (Revision: 65502) from the contents of
@@ -14,7 +14,7 @@
 #     ABSTRACT_FROM => q[lib/SPM/Util/Num.pm]
 #     AUTHOR => q[Sean Malloy <spinelli85@gmail.com@>]
 #     BUILD_REQUIRES => {  }
-#     NAME => q[SPM::Util::Num]
+#     NAME => q[SPM::Util]
 #     PREREQ_PM => {  }
 #     VERSION_FROM => q[lib/SPM/Util/Num.pm]
 
@@ -53,8 +53,8 @@ VENDORLIBEXP = /usr/share/perl5
 AR_STATIC_ARGS = cr
 DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
-NAME = SPM::Util::Num
-NAME_SYM = SPM_Util_Num
+NAME = SPM::Util
+NAME_SYM = SPM_Util
 VERSION = 0.01
 VERSION_MACRO = VERSION
 VERSION_SYM = 0_01
@@ -143,9 +143,9 @@ MM_REVISION = 65502
 # PARENT_NAME = NAME without BASEEXT and no trailing :: (eg Foo::Bar)
 # DLBASE  = Basename part of dynamic library. May be just equal BASEEXT.
 MAKE = make
-FULLEXT = SPM/Util/Num
-BASEEXT = Num
-PARENT_NAME = SPM::Util
+FULLEXT = SPM/Util
+BASEEXT = Util
+PARENT_NAME = SPM
 DLBASE = $(BASEEXT)
 VERSION_FROM = lib/SPM/Util/Num.pm
 OBJECT = 
@@ -166,8 +166,8 @@ MAN3PODS = lib/SPM/Exception.pm \
 CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h
 
 # Where to build things
-INST_LIBDIR      = $(INST_LIB)/SPM/Util
-INST_ARCHLIBDIR  = $(INST_ARCHLIB)/SPM/Util
+INST_LIBDIR      = $(INST_LIB)/SPM
+INST_ARCHLIBDIR  = $(INST_ARCHLIB)/SPM
 
 INST_AUTODIR     = $(INST_LIB)/auto/$(FULLEXT)
 INST_ARCHAUTODIR = $(INST_ARCHLIB)/auto/$(FULLEXT)
@@ -256,8 +256,8 @@ CI = ci -u
 RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
-DISTNAME = SPM-Util-Num
-DISTVNAME = SPM-Util-Num-0.01
+DISTNAME = SPM-Util
+DISTVNAME = SPM-Util-0.01
 
 
 # --- MakeMaker macro section:
@@ -479,9 +479,9 @@ realclean purge ::  clean realclean_subdirs
 metafile : create_distdir
 	$(NOECHO) $(ECHO) Generating META.yml
 	$(NOECHO) $(ECHO) '--- #YAML:1.0' > META_new.yml
-	$(NOECHO) $(ECHO) 'name:               SPM-Util-Num' >> META_new.yml
+	$(NOECHO) $(ECHO) 'name:               SPM-Util' >> META_new.yml
 	$(NOECHO) $(ECHO) 'version:            0.01' >> META_new.yml
-	$(NOECHO) $(ECHO) 'abstract:           Perl number utility' >> META_new.yml
+	$(NOECHO) $(ECHO) 'abstract:           ~' >> META_new.yml
 	$(NOECHO) $(ECHO) 'author:' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - Sean Malloy <spinelli85@gmail.com@>' >> META_new.yml
 	$(NOECHO) $(ECHO) 'license:            unknown' >> META_new.yml
@@ -767,7 +767,7 @@ testdb_static :: testdb_dynamic
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
 	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0.01">' > $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '    <ABSTRACT>Perl number utility</ABSTRACT>' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '    <ABSTRACT></ABSTRACT>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Sean Malloy &lt;spinelli85@gmail.com@&gt;</AUTHOR>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="i486-linux-gnu-thread-multi-5.10" />' >> $(DISTNAME).ppd

@@ -3,4 +3,6 @@ Makefile.PL
 MANIFEST
 README
 t/SPM-Util-Num.t
+t/SPM-Exception.t
 lib/SPM/Util/Num.pm
+lib/SPM/Exception.pm

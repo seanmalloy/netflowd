@@ -14,7 +14,7 @@ our $VERSION   = '0.01';
 sub bin2dec {
     my $num = shift;
     if (!defined $num) {
-        return 0;
+        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
     }
     # References are invalid input.
     if (ref($num) ne '') {
@@ -22,7 +22,7 @@ sub bin2dec {
     }
     
     # Only binary number are valid input.
-    if ($num !~ /[0-1]+/) {
+    if ($num !~ /^[0-1]+$/) {
         SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
     }
     
@@ -40,11 +40,17 @@ sub bin2dottedquad {
         SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
     }
 
-    if (length($ipv4) != 32) {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
-    }
     # References are invalid input.
     if (ref($ipv4) ne '') {
+        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+    }
+
+    # Only binary number are valid input.
+    if ($ipv4 !~ /^[0-1]+$/) {
+        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+    }
+
+    if (length($ipv4) != 32) {
         SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
     }
     my ($part1, $part2, $part3, $part4) = unpack "A8A8A8A8", $ipv4;
@@ -52,20 +58,29 @@ sub bin2dottedquad {
         '.' . bin2dec($part4));
 }
 
-# Convert a number from decimal to binary. Retuns 32 bit binary
-# number.
+# Convert a number from decimal to binary.
 sub dec2bin {
-    # TODO: stub function, add error checking
     my $num = shift;
-    $num = sprintf("%b", $num);
-    my $pad_length = 32 - length($num);
-    return(('0' x $pad_length) . $num);
+
+    if (!defined $num) {
+        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+    }
+
+    # References are invalid input.
+    if (ref($num) ne '') {
+        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+    }
+    
+    # Only numbers are valid input.
+    if ($num !~ /^\d+$/) {
+        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+    }
+    return(sprintf("%b", $num));
 }
 
 1;
 __END__
 # TODO: document the fact that input with leading zeroes must be a string, not a number.
-# TODO: document the fact that undef input returns 0.
 
 =head1 NAME
 

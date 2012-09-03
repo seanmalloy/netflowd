@@ -4,14 +4,19 @@ use 5.010001;
 use strict;
 use warnings;
 use Exception::Class::Base;
-
 our @ISA = qw(Exception::Class::Base);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
 our $VERSION = '0.01';
+1;
+
+package SPM::Exception::InvalidInputUndef;
+our @ISA = qw(SPM::Exception);
+our $VERSION = '0.01';
+1;
+
+package SPM::Exception::InvalidInputReference;
+our @ISA = qw(SPM::Exception);
+our $VERSION = '0.01';
+1;
 
 # Methods to subclass.
 #
@@ -32,7 +37,6 @@ our $VERSION = '0.01';
 # rethrow
 # new
 
-1;
 __END__
 # Below is stub documentation for your module. You'd better edit it!
 
