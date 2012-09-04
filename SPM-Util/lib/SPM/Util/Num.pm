@@ -14,16 +14,16 @@ our $VERSION   = '0.01';
 sub bin2dec {
     my $num = shift;
     if (!defined $num) {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+        SPM::Exception::InvalidInputUndef->throw;
     }
     # References are invalid input.
     if (ref($num) ne '') {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+        SPM::Exception::InvalidInputReference->throw;
     }
     
     # Only binary number are valid input.
     if ($num !~ /^[0-1]+$/) {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+        SPM::Exception::OutOfRange->throw;
     }
     
     # Strip leading zeroes.
@@ -37,21 +37,21 @@ sub bin2dottedquad {
     my $ipv4 = shift;
 
     if (!defined $ipv4) {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+        SPM::Exception::InvalidInputUndef->throw;
     }
 
     # References are invalid input.
     if (ref($ipv4) ne '') {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+        SPM::Exception::InvalidInputReference->throw;
     }
 
     # Only binary number are valid input.
     if ($ipv4 !~ /^[0-1]+$/) {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+        SPM::Exception::OutOfRange->throw;
     }
 
     if (length($ipv4) != 32) {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+        SPM::Exception::OutOfRange->throw;
     }
     my ($part1, $part2, $part3, $part4) = unpack "A8A8A8A8", $ipv4;
     return(bin2dec($part1) . '.' . bin2dec($part2) . '.' . bin2dec($part3) .
@@ -63,17 +63,17 @@ sub dec2bin {
     my $num = shift;
 
     if (!defined $num) {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+        SPM::Exception::InvalidInputUndef->throw;
     }
 
     # References are invalid input.
     if (ref($num) ne '') {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+        SPM::Exception::InvalidInputReference->throw;
     }
     
     # Only numbers are valid input.
     if ($num !~ /^\d+$/) {
-        SPM::Exception->throw("Invalid input"); # TODO: change to different exception type.
+        SPM::Exception::OutOfRange->throw;
     }
     return(sprintf("%b", $num));
 }

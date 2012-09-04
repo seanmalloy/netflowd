@@ -18,6 +18,11 @@ our @ISA = qw(SPM::Exception);
 our $VERSION = '0.01';
 1;
 
+package SPM::Exception::OutOfRange;
+our @ISA = qw(SPM::Exception);
+our $VERSION = '0.01';
+1;
+
 # Methods to subclass.
 #
 # isa

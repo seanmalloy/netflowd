@@ -10,12 +10,13 @@ NetFlow Module Tasks
 
 SPM Module Tasks
 ----------------
-* Update SPM::Util::Num module to throw updated exceptions
-* Write function SPM::Util::Num::dec2bin.
-* Write test for function SPM::Util::Num::dec2bin.
-* Add additional types of exceptions to SPM::Exception.
+* Break exception classes in separate files.
 
 Documentation Tasks
 -------------------
 * Write all documentation for NetFlow::Data, NetFlow::Parser, SPM::Util::Num,
   SPM::Exception.
+
+Miscelaneous
+------------
+* read man module-starter
