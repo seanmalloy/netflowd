@@ -37,27 +37,62 @@ sub new {
     return $self;
 }
 
-# START: create accessor for each of the below.
-#srcaddr   => undef, # Source IP address
-#dstaddr   => undef, # Destination IP address
-#nexthop   => undef, # IP address of next hop router
-#input     => undef, # SNMP index of input interface
-#output    => undef, # SNMP index of output inferface
-#packets   => undef, # Number of packets in the flow
-#bytes     => undef, # Number of bytes in the flow
-#first     => undef, # Uptime at start of flow
-#last      => undef, # Uptime at end of flow
-#srcport   => undef, # source port
-#dstport   => undef, # destination port
-#pad1      => undef, # filler
-#tcp_flags => undef, # Cumulative OR of TCP flags
-#protocol  => undef, # IP protocol type (for example, TCP = 6; UDP = 17)
-#tos       => undef, # IP type of service (ToS)
-#src_as    => undef, # Autonomous system number of the source, either origin or peer
-#dst_as    => undef, # Autonomous system number of the destination, either origin or peer
-#src_mask  => undef, # Source address prefix mask bits
-#dst_mask  => undef, # Destination address prefix mask bits
-#pad2      => undef, # filler
+
+sub srcaddr {
+    
+}
+
+sub dstaddr {
+
+}
+
+sub nexthop {
+
+}
+
+sub packets {
+    
+}
+
+sub bytes {
+
+}
+
+sub first {
+
+}
+
+sub last {
+
+}
+
+sub srcport {
+
+}
+
+sub dstport {
+    
+}
+
+sub tcp_flags {
+    
+}
+
+sub protocol {
+
+}
+
+sub tos {
+    
+}
+
+sub src_as {
+
+}
+
+sub dst_as {
+
+}
 
 1;
 
