@@ -1,98 +1,66 @@
 package NetFlow::Data;
 
-use 5.010001;
-use strict;
-use warnings;
+#use 5.010001;
+use Moose;
+
 our $VERSION = '0.01';
 
 # Only works with NetFlow V5.
 
+use Moose::Util::TypeConstraints;
+
+subtype 'Natural'
+    => as 'Int'
+    => where { $_ > 0 };
+
+subtype 'PortNumber'
+    => as 'Natural'
+    => where { $_ < 65536 }
+    => message { "This number ($_) is not less than 65536" };
+
+no Moose::Util::TypeConstraints;
+
 # Constructor
 # input: none
-sub new {
-    my $class = shift;
-    my $self = {
-        srcaddr   => undef, # Source IP address
-        dstaddr   => undef, # Destination IP address
-        nexthop   => undef, # IP address of next hop router
-        input     => undef, # SNMP index of input interface
-        output    => undef, # SNMP index of output inferface
-        packets   => undef, # Number of packets in the flow
-        bytes     => undef, # Number of bytes in the flow
-        first     => undef, # Uptime at start of flow
-        last      => undef, # Uptime at end of flow
-        srcport   => undef, # source port
-        dstport   => undef, # destination port
-        pad1      => undef, # filler
-        tcp_flags => undef, # Cumulative OR of TCP flags
-        protocol  => undef, # IP protocol type (for example, TCP = 6; UDP = 17)
-        tos       => undef, # IP type of service (ToS)
-        src_as    => undef, # Autonomous system number of the source, either origin or peer
-        dst_as    => undef, # Autonomous system number of the destination, either origin or peer
-        src_mask  => undef, # Source address prefix mask bits
-        dst_mask  => undef, # Destination address prefix mask bits
-        pad2      => undef, # filler
-    };
-    bless $self, $class;
-    return $self;
-}
+#sub new {
+#    my $class = shift;
+#    my $self = {
+#        srcaddr  => undef, # Source IP address
+#        dstaddr  => undef, # Destination IP address
+#        nexthop  => undef, # IP address of next hop router
+#        input    => undef, # SNMP index of input interface
+#        output   => undef, # SNMP index of output inferface
+#        packets  => undef, # Number of packets in the flow
+#        bytes    => undef, # Number of bytes in the flow
+#        first    => undef, # Uptime at start of flow
+#        last     => undef, # Uptime at end of flow
+#        srcport  => undef, # source port
+#        dstport  => undef, # destination port
+#        tcpflags => undef, # Cumulative OR of TCP flags
+#        protocol => undef, # IP protocol type (for example, TCP = 6; UDP = 17)
+#        tos      => undef, # IP type of service (ToS)
+#        srcas    => undef, # Autonomous system number of the source, either origin or peer
+#        dstas    => undef, # Autonomous system number of the destination, either origin or peer
+#    };
+#    bless $self, $class;
+#    return $self;
+#}
+#
 
-
-sub srcaddr {
-    
-}
-
-sub dstaddr {
-
-}
-
-sub nexthop {
-
-}
-
-sub packets {
-    
-}
-
-sub bytes {
-
-}
-
-sub first {
-
-}
-
-sub last {
-
-}
-
-sub srcport {
-
-}
-
-sub dstport {
-    
-}
-
-sub tcp_flags {
-    
-}
-
-sub protocol {
-
-}
-
-sub tos {
-    
-}
-
-sub src_as {
-
-}
-
-sub dst_as {
-
-}
+has 'bytes'    => (isa => 'Int', is => 'ro', required => 1);
+has 'dstaddr'  => (isa => 'Str', is => 'ro', required => 1);
+has 'dstport'  => (isa => 'PortNumber', is => 'ro', required => 1);
+has 'first'    => (isa => 'Int', is => 'ro', required => 1);
+has 'last'     => (isa => 'Int', is => 'ro', required => 1);
+has 'packets'  => (isa => 'Int', is => 'ro', required => 1);
+has 'protocol' => (isa => 'Natural', is => 'ro', required => 1);
+has 'srcaddr'  => (isa => 'Str', is => 'ro', required => 1);
+has 'srcport'  => (isa => 'PortNumber', is => 'ro', required => 1);
+has 'nexthop'  => (isa => 'Str', is => 'ro', required => 1);
+has 'tcpflags' => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
+has 'tos'      => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
+has 'srcas'    => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
+has 'dstas'    => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
 
 1;
 
