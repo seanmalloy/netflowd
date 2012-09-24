@@ -9,6 +9,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 BEGIN { use_ok('NetFlow::Data') };
 BEGIN { require_ok('NetFlow::Data') };
 
@@ -51,8 +52,19 @@ is($obj->srcport(), 1099, 'srcport accessor');
 is($obj->tcpflags(), 'test', 'tcpflags accessor');
 is($obj->tos(), 'test', 'tos accessor');
 
+$data->{bytes} = -1;
+dies_ok { NetFlow::Data->new( $data ) }, 'constructor dies negative bytes';
+$data->{bytes} = 1;
 
-TODO: { };
+# TODO: Need to add more tests
+my @invalid_dest_addresses = qw( "1" "z" );
+for my $address (@invalid_dest_addresses) {
+    $data->{dstaddr} = $address;
+    dies_ok { NetFlow::Data->new( $data ) }, "constructor dies invalid dstaddr $address";
+}
+
+
+#TODO: { };
 
 done_testing();
 

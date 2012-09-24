@@ -16,7 +16,17 @@ subtype 'Natural'
 subtype 'PortNumber'
     => as 'Natural'
     => where { $_ < 65536 }
-    => message { "This number ($_) is not less than 65536" };
+    => message { "Number ($_) is not less than 65536" };
+
+subtype 'NaturalIncZero'
+    => as 'Int'
+    => where { $_ > -1 }
+    => message { "Number ($_) is not greater than -1" };
+
+subtype 'IPAddress'
+    => as 'Str'
+    => where { $_ =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/ }  # TODO: this is not correct
+    => message { "String ($_) is not a valid IP address" };
 
 no Moose::Util::TypeConstraints;
 
@@ -47,16 +57,16 @@ no Moose::Util::TypeConstraints;
 #}
 #
 
-has 'bytes'    => (isa => 'Int', is => 'ro', required => 1);
-has 'dstaddr'  => (isa => 'Str', is => 'ro', required => 1);
+has 'bytes'    => (isa => 'NaturalIncZero', is => 'ro', required => 1);
+has 'dstaddr'  => (isa => 'IPAddress', is => 'ro', required => 1);
 has 'dstport'  => (isa => 'PortNumber', is => 'ro', required => 1);
 has 'first'    => (isa => 'Int', is => 'ro', required => 1);
 has 'last'     => (isa => 'Int', is => 'ro', required => 1);
 has 'packets'  => (isa => 'Int', is => 'ro', required => 1);
 has 'protocol' => (isa => 'Natural', is => 'ro', required => 1);
-has 'srcaddr'  => (isa => 'Str', is => 'ro', required => 1);
+has 'srcaddr'  => (isa => 'IPAddress', is => 'ro', required => 1);
 has 'srcport'  => (isa => 'PortNumber', is => 'ro', required => 1);
-has 'nexthop'  => (isa => 'Str', is => 'ro', required => 1);
+has 'nexthop'  => (isa => 'IPAddress', is => 'ro', required => 1);
 has 'tcpflags' => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
 has 'tos'      => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
 has 'srcas'    => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
