@@ -13,13 +13,8 @@ our $VERSION   = '0.01';
 # Convert a number from binary to decimal.
 sub bin2dec {
     my $num = shift;
-    if (!defined $num) {
-        SPM::Exception::InvalidInputUndef->throw;
-    }
-    # References are invalid input.
-    if (ref($num) ne '') {
-        SPM::Exception::InvalidInputReference->throw;
-    }
+    _check_undef($num);
+    _check_reference($num);
     
     # Only binary number are valid input.
     if ($num !~ /^[0-1]+$/) {
@@ -35,15 +30,8 @@ sub bin2dec {
 # Convert a 32 bit IPv4 address to dotted quad notation.
 sub bin2dottedquad {
     my $ipv4 = shift;
-
-    if (!defined $ipv4) {
-        SPM::Exception::InvalidInputUndef->throw;
-    }
-
-    # References are invalid input.
-    if (ref($ipv4) ne '') {
-        SPM::Exception::InvalidInputReference->throw;
-    }
+    _check_undef($ipv4);
+    _check_reference($ipv4);
 
     # Only binary number are valid input.
     if ($ipv4 !~ /^[0-1]+$/) {
@@ -61,21 +49,30 @@ sub bin2dottedquad {
 # Convert a number from decimal to binary.
 sub dec2bin {
     my $num = shift;
+    _check_undef($num);
+    _check_reference($num);
 
-    if (!defined $num) {
-        SPM::Exception::InvalidInputUndef->throw;
-    }
-
-    # References are invalid input.
-    if (ref($num) ne '') {
-        SPM::Exception::InvalidInputReference->throw;
-    }
-    
     # Only numbers are valid input.
     if ($num !~ /^\d+$/) {
         SPM::Exception::OutOfRange->throw;
     }
     return(sprintf("%b", $num));
+}
+
+sub _check_reference {
+    my $parameter = shift;
+    if (ref($parameter) ne '') {
+        SPM::Exception::InvalidInputReference->throw;
+    }
+    return $parameter;
+}
+
+sub _check_undef {
+    my $parameter = shift;
+    if (!defined $parameter) {
+        SPM::Exception::InvalidInputUndef->throw;
+    }
+    return $parameter;
 }
 
 1;

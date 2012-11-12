@@ -1,22 +1,16 @@
-Read the following Perl docs:
-perlnewmod          Perl modules: preparing a new module for distribution
-
 NetFlow Module Tasks
 --------------------
-* Should NetFlow::Data::new actually populate the data field of a flow
-  or should NetFlow::Parser::parse do it?
-* Create a stub for the class NetFlow::Data.
 * Finish the NetFlow::Parser::parse method.
+* Finish tests for NetFlow::Parser.
+* Update NetFlow::Data::tcpflags, NetFlow::Data::tos, NetFlow::Data::srcas,
+  NetFlow::Data::dstas with correct datatype. Also update corresponding tests.
 
 SPM Module Tasks
 ----------------
-* Break exception classes in separate files.
+* Break exception classes into separate files.
 
 Documentation Tasks
 -------------------
 * Write all documentation for NetFlow::Data, NetFlow::Parser, SPM::Util::Num,
   SPM::Exception.
 
-Miscelaneous
-------------
-* read man module-starter

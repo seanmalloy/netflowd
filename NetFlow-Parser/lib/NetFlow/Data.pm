@@ -18,52 +18,30 @@ subtype 'PortNumber'
     => where { $_ < 65536 }
     => message { "Number ($_) is not less than 65536" };
 
-subtype 'NaturalIncZero'
+subtype 'NaturalIncludingZero'
     => as 'Int'
     => where { $_ > -1 }
     => message { "Number ($_) is not greater than -1" };
 
+subtype 'ProtocolNumber'
+    => as 'NaturalIncludingZero'
+    => where { $_ < 255 }
+    => message { "Number ($_) is not less than 255" };
+
 subtype 'IPAddress'
     => as 'Str'
-    => where { $_ =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/ }  # TODO: this is not correct
+    => where { $_ =~ /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/ }
     => message { "String ($_) is not a valid IP address" };
 
 no Moose::Util::TypeConstraints;
 
-# Constructor
-# input: none
-#sub new {
-#    my $class = shift;
-#    my $self = {
-#        srcaddr  => undef, # Source IP address
-#        dstaddr  => undef, # Destination IP address
-#        nexthop  => undef, # IP address of next hop router
-#        input    => undef, # SNMP index of input interface
-#        output   => undef, # SNMP index of output inferface
-#        packets  => undef, # Number of packets in the flow
-#        bytes    => undef, # Number of bytes in the flow
-#        first    => undef, # Uptime at start of flow
-#        last     => undef, # Uptime at end of flow
-#        srcport  => undef, # source port
-#        dstport  => undef, # destination port
-#        tcpflags => undef, # Cumulative OR of TCP flags
-#        protocol => undef, # IP protocol type (for example, TCP = 6; UDP = 17)
-#        tos      => undef, # IP type of service (ToS)
-#        srcas    => undef, # Autonomous system number of the source, either origin or peer
-#        dstas    => undef, # Autonomous system number of the destination, either origin or peer
-#    };
-#    bless $self, $class;
-#    return $self;
-#}
-#
-
-has 'bytes'    => (isa => 'NaturalIncZero', is => 'ro', required => 1);
-has 'dstaddr'  => (isa => 'IPAddress', is => 'ro', required => 1);
-has 'dstport'  => (isa => 'PortNumber', is => 'ro', required => 1);
-has 'first'    => (isa => 'Int', is => 'ro', required => 1);
-has 'last'     => (isa => 'Int', is => 'ro', required => 1);
+has 'bytes'    => (isa => 'NaturalIncludingZero', is => 'ro', required => 1); #
+has 'dstaddr'  => (isa => 'IPAddress', is => 'ro', required => 1);            #
+has 'dstport'  => (isa => 'PortNumber', is => 'ro', required => 1);           #
+has 'first'    => (isa => 'Int', is => 'ro', required => 1);                  # sysuptime in milliseconds at start of flow
+has 'last'     => (isa => 'Int', is => 'ro', required => 1);                  # sysuptime in milliseconds at end of flow
 has 'packets'  => (isa => 'Int', is => 'ro', required => 1);
-has 'protocol' => (isa => 'Natural', is => 'ro', required => 1);
+has 'protocol' => (isa => 'ProtocolNumber', is => 'ro', required => 1);
 has 'srcaddr'  => (isa => 'IPAddress', is => 'ro', required => 1);
 has 'srcport'  => (isa => 'PortNumber', is => 'ro', required => 1);
 has 'nexthop'  => (isa => 'IPAddress', is => 'ro', required => 1);
@@ -71,6 +49,8 @@ has 'tcpflags' => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure ou
 has 'tos'      => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
 has 'srcas'    => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
 has 'dstas'    => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

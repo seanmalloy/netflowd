@@ -1,123 +1,155 @@
 package NetFlow::Parser;
 
 use 5.010001;
-use strict;
-use warnings;
+use Moose;
 use SPM::Util::Num qw(bin2dec bin2dottedquad);
 use NetFlow::Data;
 our $VERSION = '0.01';
 
 # Only works with NetFlow V5.
-# Example Usage:
+# Example Usage of Public Interface:
 #    ->new();
-#    ->input($netflow_packet);
+#    ->read_packet($netflow_packet);
 #    ->parse();
 
-# Constructor
-# input: none
-sub new {
-    my $class = shift;
-    my $self  = { flows_remaining   => undef, # Number of flows that can still be parsed
-                  raw_packet        => undef, # Raw NetFlow binary packet
+# Example Usage:
+#
+# my $nf_parser = NetFlow::Parser->new();
+# $nf_parser->read_packet($packet);
+# my @flows = $nf_parser->parse();
 
-                  # Fields from NetFlow v5 packet header.
-                  version           => undef, # NetFlow export format version number
-                  count             => undef, # Number of flows exported in this packet
-                  sys_uptime        => undef, # Current time in milliseconds since the export device booted
-                  unix_secs         => undef, # Current count of seconds since 0000 UTC 1970
-                  unix_nsecs        => undef, # Residual nanoseconds since 0000 UTC 1970
-                  flow_sequence     => undef, # Sequence counter of total flows seen
-                  engine_type       => undef, # Type of flow-switching engine
-                  engine_id         => undef, # Slot number of the flow-switching engine
-                  sampling_mode     => undef, # Sampling Mode
-                  sampling_interval => undef, # Sampling Interval
-    };
-    bless $self, $class;
-    return $self;
-}
 
-# input: binary NetFlow packet(header and flow records).
-sub input {
-    my $self = shift;
-    $self->{raw_packet} = shift;
+has 'raw_data'          => (isa => 'Any', is => 'rw', required => 0); # TODO: default value?, isa?, this is the entire raw packet
+has 'raw_flows'         => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?, this is the string version of all flows
+has 'version'           => (isa => 'Int', is => 'rw', required => 0); # TODO: isa?
+has 'count'             => (isa => 'Int', is => 'rw', required => 0); # TODO: isa?
+has 'sys_uptime'        => (isa => 'Any', is => 'rw', required => 0); # TODO: isa? milliseconds since device was booted
+has 'unix_secs'         => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?
+has 'unix_nsecs'        => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?
+has 'flow_sequence'     => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?
+has 'engine_type'       => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?
+has 'engine_id'         => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?
+has 'sampling_mode'     => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?
+has 'sampling_interval' => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?
+
+#sub new {
+#    my $class = shift;
+#    my $self  = { raw_data          => undef, # Raw NetFlow binary packet
+#
+#                  # Fields from NetFlow v5 packet header.
+#                  version           => undef, # NetFlow export format version number
+#                  count             => undef, # Number of flows exported in this packet
+#                  sys_uptime        => undef, # Current time in milliseconds since the export device booted
+#                  unix_secs         => undef, # Current count of seconds since 0000 UTC 1970
+#                  unix_nsecs        => undef, # Residual nanoseconds since 0000 UTC 1970
+#                  flow_sequence     => undef, # Sequence counter of total flows seen
+#                  engine_type       => undef, # Type of flow-switching engine
+#                  engine_id         => undef, # Slot number of the flow-switching engine
+#                  sampling_mode     => undef, # Sampling Mode
+#                  sampling_interval => undef, # Sampling Interval
+#    };
+#    bless $self, $class;
+#    return $self;
+#}
+
+sub read_packet {
+    my $self   = shift;
+    my $packet = shift;
+    $self->raw_data($packet);
     $self->_read_header();
 }
 
 # START: finish the parse method.
-# returns: NetFlow::Data object. undef or empty list when there are no more
-# flows to parse.
+# returns: List of NetFlow::Data objects.
 sub parse {
-    warn "################### START parse";
+    #warn "################### START parse";
     my $self = shift;
-    if ($self->{flows_remaining} == 0) {
-        warn("no flows remaining");
-        return;
+
+    # TODO: where should this code go?
+    # validate length of all flows. each flow record is 384 bits.
+    if ( length($self->raw_flows()) ne (384 * $self->count()) ) {
+        die "parse: invalid flow record length";
     }
 
-    # TODO: Below code needs work.
-    my $offset = 0;    
-    for (1..$self->{count}) {
-        my $flow = substr($self->{raw_packet}, $offset, 384); # 384 = number of bits in a flow record
-        warn "Length of Flow Data: " . length($flow);
+    my $offset = 0;
+    my $flow;
+    my $flow_string;
+    my @flows;
+    for (1..$self->count()) {
+        $flow_string = substr($self->raw_flows(), $offset, 384); # 384 = number of bits in a flow record
+        warn "Length of Flow Data: " . length($flow_string);
         my ($srcaddr, $dstaddr, $nexthop,  $input,    $output, $dpkts,     $doctets,
             $first,    $last,    $srcport,  $dstport,  $pad1,   $tcp_flags, $prot, $tos,
             $src_as,  $dst_as,  $src_mask, $dst_mask, $pad2) =
-                unpack('A32A32A32A16A16A32A32A32A32A16A16A8A8A8A8A16A16A8A8A16', $flow);
+                unpack('A32A32A32A16A16A32A32A32A32A16A16A8A8A8A8A16A16A8A8A16', $flow_string);
         # Convert Data
-        $srcaddr = bin2dottedquad($srcaddr);
-        $dstaddr = bin2dottedquad($dstaddr);
-        $nexthop = bin2dottedquad($nexthop);
-        $input   = bin2dec($input);
-        $output  = bin2dec($output);
-        $dpkts   = bin2dec($dpkts);
-        $doctets = bin2dec($doctets);
-        # TODO: convert first
-        # TODO: convert last
-        $srcport = bin2dec($srcport);
-        $dstport = bin2dec($dstport);
-        $pad1    = bin2dec($pad1);
-        # TODO: convert tcp_flags
-        $prot = bin2dec($prot);
-        # TODO: convert tos
-        # TODO: convert src_as
-        # TODO: convert dst_as
-        # TODO: convert src_mask
-        # TODO: convert dst_mask
+        $srcaddr   = bin2dottedquad($srcaddr);
+        $dstaddr   = bin2dottedquad($dstaddr);
+        $nexthop   = bin2dottedquad($nexthop);
+        $input     = bin2dec($input);
+        $output    = bin2dec($output);
+        $dpkts     = bin2dec($dpkts);
+        $doctets   = bin2dec($doctets);
+        $first     = bin2dec($first);
+        $last      = bin2dec($last);
+        $srcport   = bin2dec($srcport);
+        $dstport   = bin2dec($dstport);
+        $pad1      = bin2dec($pad1);
+        $tcp_flags = bin2dec($tcp_flags);
+        $prot      = bin2dec($prot);
+        $tos       = bin2dec($tos);
+        $src_as    = bin2dec($src_as);
+        $dst_as    = bin2dec($dst_as);
+        $src_mask  = bin2dec($src_mask);
+        $dst_mask  = bin2dec($dst_mask);
         $pad2 = bin2dec($pad2);
-        print "\n";
-        warn "Source Addr: $srcaddr";
-        warn "Dest Addr:   $dstaddr";
-        warn "Next Hop:    $nexthop";
-        warn "Input:       $input";
-        warn "Output:      $output";
-        warn "Dpkts:       $dpkts";
-        warn "Octects:     $doctets";
-        warn "First:       $first";
-        warn "Last:        $last";
-        warn "Source Port: $srcport";
-        warn "Dest Port:   $dstport";
-        warn "Pad1:        $pad1";
-        warn "TCP Flags:   $tcp_flags";
-        warn "Protocol:    $prot";
-        warn "TOS:         $tos";
-        warn "Source AS:   $src_as";
-        warn "Dest AS:     $dst_as";
-        warn "Source mask: $src_mask";
-        warn "Dest mask:   $dst_mask";
-        warn "Pad2:        $pad2";
-        print "\n";
+        $flow = NetFlow::Data->new(
+            srcaddr  => $srcaddr,
+            dstaddr  => $dstaddr,
+            nexthop  => $nexthop,
+            #$input,
+            #$output,
+            packets  => $dpkts,
+            bytes    => $doctets,
+            first    => $first,
+            last     => $last,
+            srcport  => $srcport,
+            dstport  => $dstport,
+            tcpflags => $tcp_flags,
+            protocol => $prot,
+            tos      => $tos,
+            srcas    => $src_as,
+            dstas    => $dst_as,
+            #$src_mask,
+            #$dst_mask,
+        );
+        push @flows, $flow;
+        #print "\n";
+        #warn "Source Addr: $srcaddr";
+        #warn "Dest Addr:   $dstaddr";
+        #warn "Next Hop:    $nexthop";
+        #warn "Input:       $input";
+        #warn "Output:      $output";
+        #warn "Dpkts:       $dpkts";
+        #warn "Octects:     $doctets";
+        #warn "First:       $first";
+        #warn "Last:        $last";
+        #warn "Source Port: $srcport";
+        #warn "Dest Port:   $dstport";
+        #warn "Pad1:        $pad1";
+        #warn "TCP Flags:   $tcp_flags";
+        #warn "Protocol:    $prot";
+        #warn "TOS:         $tos";
+        #warn "Source AS:   $src_as";
+        #warn "Dest AS:     $dst_as";
+        #warn "Source mask: $src_mask";
+        #warn "Dest mask:   $dst_mask";
+        #warn "Pad2:        $pad2";
+        #print "\n";
         $offset += 384;
     }
-    my $random_data = substr($self->{raw_packet}, $offset); # TODO: removing this code
-    warn "Lenght of extra data: " . length($random_data);
-    warn "############################### end parse";
-}
-
-# input: none
-# returns: number of flows that can still be parsed.
-sub remaining {
-    my $self = shift;
-    return $self->{flows_remaining};
+    #warn "############################### end parse";
+    return @flows;
 }
 
 sub _read_header {
@@ -127,33 +159,34 @@ sub _read_header {
         $unix_nsecs,    $flow_sequence,     $engine_type, $engine_id,
         $sampling_mode, $sampling_interval, $flows) =
     #unpack('n1n1N1N1N1N1H2H2B2B14B*', $self->{raw_packet}); # TODO - does it work on little and big endian machines?
-            unpack('n1n1N1N1N1N1H2H2B2B6B*', $self->{raw_packet}); # TODO - why does this work
+            unpack('n1n1N1N1N1N1H2H2B2B6B*', $self->raw_data()); # TODO - why does this work
 
-    warn "Version: $version";
-    warn "Count: $count";
-    warn "Sysuptime: $sysuptime";
-    warn "Unix_Secs: $unix_secs";
-    warn "Unix NSencs: $unix_nsecs";
-    warn "Flow Seq: $flow_sequence";
-    warn "Engine Type: $engine_type";
-    warn "Engine ID: $engine_id";
-    warn "Sampling Mode: $sampling_mode";
-    warn "Sampleing Interval: $sampling_interval";
-    warn "Raw Flow Data Length(bits): " . length($flows);
+    #warn "Version: $version";
+    #warn "Count: $count";
+    #warn "Sysuptime: $sysuptime";
+    #warn "Unix_Secs: $unix_secs";
+    #warn "Unix NSencs: $unix_nsecs";
+    #warn "Flow Seq: $flow_sequence";
+    #warn "Engine Type: $engine_type";
+    #warn "Engine ID: $engine_id";
+    #warn "Sampling Mode: $sampling_mode";
+    #warn "Sampleing Interval: $sampling_interval";
+    #warn "Raw Flow Data Length(bits): " . length($flows);
 
-    $self->{version}           = $version;
-    $self->{count}             = $count;
-    $self->{sys_uptime}        = $sysuptime;
-    $self->{unix_secs}         = $unix_secs;
-    $self->{unix_nsecs}        = $unix_nsecs;
-    $self->{flow_sequence}     = $flow_sequence;
-    $self->{engine_type}       = hex $engine_type;
-    $self->{engine_id}         = hex $engine_id;
-    $self->{sampling_mode}     = bin2dec($sampling_mode);
-    $self->{sampling_interval} = bin2dec($sampling_interval);
-    $self->{raw_packet}        = $flows;
-    $self->{flows_remaining}   = $self->{count};
+    $self->version($version);
+    $self->count($count);
+    $self->sys_uptime($sysuptime);
+    $self->unix_secs($unix_secs);
+    $self->unix_nsecs($unix_nsecs);
+    $self->flow_sequence($flow_sequence);
+    $self->engine_type(hex $engine_type);
+    $self->engine_id(hex $engine_id);
+    $self->sampling_mode(bin2dec($sampling_mode));
+    $self->sampling_interval(bin2dec($sampling_interval));
+    $self->raw_flows($flows);
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 
