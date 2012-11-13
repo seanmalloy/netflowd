@@ -9,24 +9,30 @@ our $VERSION = '0.01';
 
 use Moose::Util::TypeConstraints;
 
-subtype 'Natural'
-    => as 'Int'
-    => where { $_ > 0 };
-
-subtype 'PortNumber'
-    => as 'Natural'
-    => where { $_ < 65536 }
-    => message { "Number ($_) is not less than 65536" };
-
-subtype 'NaturalIncludingZero'
+subtype 'UnsignedInt'
     => as 'Int'
     => where { $_ > -1 }
     => message { "Number ($_) is not greater than -1" };
 
-subtype 'ProtocolNumber'
-    => as 'NaturalIncludingZero'
-    => where { $_ < 255 }
-    => message { "Number ($_) is not less than 255" };
+subtype 'UnsignedInt32Bit'
+    => as 'UnsignedInt'
+    => where { $_ < 4294967296 }
+    => message { "Number ($_) is not less than 4294967296" };
+
+subtype 'UnsignedInt16Bit'
+    => as 'UnsignedInt'
+    => where { $_ < 65536 }
+    => message { "Number ($_) is not less than 65536" };
+
+subtype 'UnsignedInt8Bit'
+    => as 'UnsignedInt'
+    => where { $_ < 256 }
+    => message { "Number ($_) is not less than 256" };
+
+subtype 'UnsignedInt4Bit'
+    => as 'UnsignedInt'
+    => where { $_ < 16 }
+    => message { "Number ($_) is not less than 16" };
 
 subtype 'IPAddress'
     => as 'Str'
@@ -35,20 +41,20 @@ subtype 'IPAddress'
 
 no Moose::Util::TypeConstraints;
 
-has 'bytes'    => (isa => 'NaturalIncludingZero', is => 'ro', required => 1); #
-has 'dstaddr'  => (isa => 'IPAddress', is => 'ro', required => 1);            #
-has 'dstport'  => (isa => 'PortNumber', is => 'ro', required => 1);           #
-has 'first'    => (isa => 'Int', is => 'ro', required => 1);                  # sysuptime in milliseconds at start of flow
-has 'last'     => (isa => 'Int', is => 'ro', required => 1);                  # sysuptime in milliseconds at end of flow
-has 'packets'  => (isa => 'Int', is => 'ro', required => 1);
-has 'protocol' => (isa => 'ProtocolNumber', is => 'ro', required => 1);
-has 'srcaddr'  => (isa => 'IPAddress', is => 'ro', required => 1);
-has 'srcport'  => (isa => 'PortNumber', is => 'ro', required => 1);
-has 'nexthop'  => (isa => 'IPAddress', is => 'ro', required => 1);
-has 'tcpflags' => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
-has 'tos'      => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
-has 'srcas'    => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
-has 'dstas'    => (isa => 'Str', is => 'ro', required => 1);   # TODO: figure out data type
+has 'bytes'    => (isa => 'UnsignedInt32Bit', is => 'ro', required => 1); # total number of layer 3 bytes in the flow
+has 'dstaddr'  => (isa => 'IPAddress',        is => 'ro', required => 1); # destination IP address
+has 'dstport'  => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # destination TCP/UDP port
+has 'first'    => (isa => 'UnsignedInt32Bit', is => 'ro', required => 1); # sysuptime in milliseconds at start of flow
+has 'last'     => (isa => 'UnsignedInt32Bit', is => 'ro', required => 1); # sysuptime in milliseconds at end of flow
+has 'packets'  => (isa => 'UnsignedInt32Bit', is => 'ro', required => 1); # total number of packets in the flow
+has 'protocol' => (isa => 'UnsignedInt8Bit',  is => 'ro', required => 1); # IP protocol type
+has 'srcaddr'  => (isa => 'IPAddress',        is => 'ro', required => 1); # source IP address
+has 'srcport'  => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # source TCP/UDP port
+has 'nexthop'  => (isa => 'IPAddress',        is => 'ro', required => 1); # IP address of next hop router
+has 'tcpflags' => (isa => 'UnsignedInt8Bit',  is => 'ro', required => 1); # Cumulative OR of tcp flags
+has 'tos'      => (isa => 'UnsignedInt8Bit',  is => 'ro', required => 1); # IP type of service
+has 'srcas'    => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # AS number of source
+has 'dstas'    => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # AS number of destination
 
 __PACKAGE__->meta->make_immutable;
 
