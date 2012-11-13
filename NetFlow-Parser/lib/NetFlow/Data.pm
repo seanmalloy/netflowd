@@ -63,41 +63,112 @@ __PACKAGE__->meta->make_immutable;
 __END__
 =head1 NAME
 
-NetFlow::Data - Perl extension for blah blah blah
+NetFlow::Data - Perl extension for Netflow version 5 flow data
 
 =head1 SYNOPSIS
 
   use NetFlow::Data;
-  blah blah blah
+
+  # create object
+  my $flow = NetFlow::Data->new(
+               srcaddr  => $srcaddr,
+               dstaddr  => $dstaddr,
+               nexthop  => $nexthop,
+               packets  => $dpkts,
+               bytes    => $doctets,
+               first    => $first,
+               last     => $last,
+               srcport  => $srcport,
+               dstport  => $dstport,
+               tcpflags => $tcp_flags,
+               protocol => $prot,
+               tos      => $tos,
+               srcas    => $src_as,
+               dstas    => $dst_as,
+             );
+  # print total bytes in flow
+  print $flow->bytes(), "\n";
 
 =head1 DESCRIPTION
 
-Stub documentation for NetFlow::Data, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+Object oriented module for storing and accessing Netflow version
+5 data. Only provides a constructor and accessor methods. This module
+is meant to be used with NetFlow::Parser.
 
-Blah blah blah.
+=head1 METHODS
 
-=head2 EXPORT
+=head2 bytes
 
-None by default.
+Returns the total number of bytes contained.
 
+head2 dstaddr
 
+Returns the destination IP addresss.
+
+=head2 dstas
+
+TODO: blah
+
+=head2 dstport
+
+Returns the destionation TCP/UDP port number.
+
+=head2 first
+
+TODO: blah
+
+=head2 last
+
+TODO: blah
+
+=head2 new
+
+TODO: constructor
+
+=head2 nexthop
+
+Returns the IP address of the next hop router.
+
+=head2 packets
+
+Returns the total number of packets.
+
+=head2 protocol
+
+TODO: blah
+
+=head2 srcaddr
+
+Returns the source IP addresss.
+
+=head2 srcas
+
+TODO: blah
+
+=head2 srcport
+
+Returns the source TCP/UDP port number.
+
+=head2 tcpflags
+
+TODO: blah
+
+=head2 tos
+
+TODO: blah
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
+NetFlow::Parser
+Moose
 
-If you have a mailing list set up for your module, mention it here.
+=head1 BUGS
 
-If you have a web site set up for your module, mention it here.
+No known bugs at this time.
 
 =head1 AUTHOR
 
-Sean Malloy, E<lt>sean@E<gt>
+Sean Malloy, E<lt>spinelli85@gmail.com@E<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -106,6 +177,5 @@ Copyright (C) 2011 by Sean Malloy
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,
 at your option, any later version of Perl 5 you may have available.
-
 
 =cut
