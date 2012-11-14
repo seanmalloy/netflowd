@@ -71,20 +71,20 @@ NetFlow::Data - Perl extension for Netflow version 5 flow data
 
   # create object
   my $flow = NetFlow::Data->new(
-               srcaddr  => $srcaddr,
-               dstaddr  => $dstaddr,
-               nexthop  => $nexthop,
-               packets  => $dpkts,
                bytes    => $doctets,
+               dstaddr  => $dstaddr,
+               dstas    => $dst_as,
+               dstport  => $dstport,
                first    => $first,
                last     => $last,
-               srcport  => $srcport,
-               dstport  => $dstport,
-               tcpflags => $tcp_flags,
+               nexthop  => $nexthop,
+               packets  => $dpkts,
                protocol => $prot,
+               tcpflags => $tcp_flags,
                tos      => $tos,
+               srcaddr  => $srcaddr,
                srcas    => $src_as,
-               dstas    => $dst_as,
+               srcport  => $srcport,
              );
   # print total bytes in flow
   print $flow->bytes(), "\n";
@@ -99,51 +99,53 @@ is meant to be used with NetFlow::Parser.
 
 =head2 bytes
 
-Returns the total number of bytes contained.
+Returns the total number of bytes in the flow.
 
-head2 dstaddr
+=head2 dstaddr
 
-Returns the destination IP addresss.
+Returns the destination IPv4 addresss in dotted quad notation.
 
 =head2 dstas
 
-TODO: blah
+Returns the autonomous system number of the destination.
 
 =head2 dstport
 
-Returns the destionation TCP/UDP port number.
+Returns the destination TCP/UDP port number.
 
 =head2 first
 
-TODO: blah
+Returns the system up time in milliseconds at the start of the flow.
 
 =head2 last
 
-TODO: blah
+Returns the system up time in milliseconds when the last packet of the flow was received.
 
 =head2 new
 
-TODO: constructor
+Returns a new NetFlow::Data object. The parameters bytes, dstaddr, dstas, dstport,
+first, last, nexthop, packets, protocol, tcpflags, tos, srcaddr, srcas, and srcport
+are all required.
 
 =head2 nexthop
 
-Returns the IP address of the next hop router.
+Returns the IPv4 address of the next hop router in dotted quad notation.
 
 =head2 packets
 
-Returns the total number of packets.
+Returns the total number of packets in the flow.
 
 =head2 protocol
 
-TODO: blah
+Returns the IP protocol type. For Example TCP is 6 and UDP is 17.
 
 =head2 srcaddr
 
-Returns the source IP addresss.
+Returns the source IPv4 addresss in dotted quad notation.
 
 =head2 srcas
 
-TODO: blah
+Returns the autonomous system number of the source.
 
 =head2 srcport
 
@@ -151,16 +153,16 @@ Returns the source TCP/UDP port number.
 
 =head2 tcpflags
 
-TODO: blah
+Returns the cumulative OR of the TCP flags.
 
 =head2 tos
 
-TODO: blah
+Returns the IP type of service.
 
 =head1 SEE ALSO
 
-NetFlow::Parser
-Moose
+Read the documentation for the Perl modules
+NetFlow::Parser and Moose.
 
 =head1 BUGS
 
