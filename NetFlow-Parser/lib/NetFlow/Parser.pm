@@ -18,7 +18,6 @@ our $VERSION = '0.01';
 # $nf_parser->read_packet($packet);
 # my @flows = $nf_parser->parse();
 
-
 has 'raw_data'          => (isa => 'Any', is => 'rw', required => 0); # TODO: default value?, isa?, this is the entire raw packet
 has 'raw_flows'         => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?, this is the string version of all flows
 has 'version'           => (isa => 'Int', is => 'rw', required => 0); # TODO: isa?
@@ -31,6 +30,7 @@ has 'engine_type'       => (isa => 'Any', is => 'rw', required => 0); # TODO: is
 has 'engine_id'         => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?
 has 'sampling_mode'     => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?
 has 'sampling_interval' => (isa => 'Any', is => 'rw', required => 0); # TODO: isa?
+has 'debug'             => (isa => 'UnsignedInt', is => 'rw', required => 1, default => 0); # set to > 0 enable debug, set to 0 turn off debug
 
 #sub new {
 #    my $class = shift;
@@ -59,11 +59,12 @@ sub read_packet {
     $self->_read_header();
 }
 
-# START: finish the parse method.
 # returns: List of NetFlow::Data objects.
 sub parse {
-    #warn "################### START parse";
     my $self = shift;
+    if ($self->debug()) {
+        warn "##### START Parse #####";
+    }
 
     # TODO: where should this code go?
     # validate length of all flows. each flow record is 384 bits.
@@ -102,13 +103,13 @@ sub parse {
         $dst_as    = bin2dec($dst_as);
         $src_mask  = bin2dec($src_mask);
         $dst_mask  = bin2dec($dst_mask);
-        $pad2 = bin2dec($pad2);
+        $pad2      = bin2dec($pad2);
         $flow = NetFlow::Data->new(
             srcaddr  => $srcaddr,
             dstaddr  => $dstaddr,
             nexthop  => $nexthop,
-            #$input,
-            #$output,
+            input    => $input,
+            output   => $output,
             packets  => $dpkts,
             bytes    => $doctets,
             first    => $first,
@@ -120,35 +121,39 @@ sub parse {
             tos      => $tos,
             srcas    => $src_as,
             dstas    => $dst_as,
-            #$src_mask,
-            #$dst_mask,
+            srcmask  => $src_mask,
+            dstmask  => #$dst_mask,
         );
         push @flows, $flow;
-        #print "\n";
-        #warn "Source Addr: $srcaddr";
-        #warn "Dest Addr:   $dstaddr";
-        #warn "Next Hop:    $nexthop";
-        #warn "Input:       $input";
-        #warn "Output:      $output";
-        #warn "Dpkts:       $dpkts";
-        #warn "Octects:     $doctets";
-        #warn "First:       $first";
-        #warn "Last:        $last";
-        #warn "Source Port: $srcport";
-        #warn "Dest Port:   $dstport";
-        #warn "Pad1:        $pad1";
-        #warn "TCP Flags:   $tcp_flags";
-        #warn "Protocol:    $prot";
-        #warn "TOS:         $tos";
-        #warn "Source AS:   $src_as";
-        #warn "Dest AS:     $dst_as";
-        #warn "Source mask: $src_mask";
-        #warn "Dest mask:   $dst_mask";
-        #warn "Pad2:        $pad2";
-        #print "\n";
+        if ($self->debug()) {
+            print "\n";
+            warn "Source Addr: $srcaddr";
+            warn "Dest Addr:   $dstaddr";
+            warn "Next Hop:    $nexthop";
+            warn "Input:       $input";
+            warn "Output:      $output";
+            warn "Dpkts:       $dpkts";
+            warn "Octects:     $doctets";
+            warn "First:       $first";
+            warn "Last:        $last";
+            warn "Source Port: $srcport";
+            warn "Dest Port:   $dstport";
+            warn "Pad1:        $pad1";
+            warn "TCP Flags:   $tcp_flags";
+            warn "Protocol:    $prot";
+            warn "TOS:         $tos";
+            warn "Source AS:   $src_as";
+            warn "Dest AS:     $dst_as";
+            warn "Source mask: $src_mask";
+            warn "Dest mask:   $dst_mask";
+            warn "Pad2:        $pad2";
+            print "\n";
+        }
         $offset += 384;
     }
-    #warn "############################### end parse";
+    if ($self->debug()) {
+        warn "##### End Parse #####";
+    }
     return @flows;
 }
 
@@ -211,8 +216,6 @@ Blah blah blah.
 =head2 EXPORT
 
 None by default.
-
-
 
 =head1 SEE ALSO
 
