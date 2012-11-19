@@ -42,19 +42,23 @@ subtype 'IPAddress'
 no Moose::Util::TypeConstraints;
 
 has 'bytes'    => (isa => 'UnsignedInt32Bit', is => 'ro', required => 1); # total number of layer 3 bytes in the flow
+has 'dstas'    => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # AS number of destination
 has 'dstaddr'  => (isa => 'IPAddress',        is => 'ro', required => 1); # destination IP address
+has 'dstmask'  => (isa => 'UnsignedInt8Bit',  is => 'ro', required => 1); # destination address prefix mask bits
 has 'dstport'  => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # destination TCP/UDP port
 has 'first'    => (isa => 'UnsignedInt32Bit', is => 'ro', required => 1); # sysuptime in milliseconds at start of flow
+has 'input'    => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # SNMP index of input interface
 has 'last'     => (isa => 'UnsignedInt32Bit', is => 'ro', required => 1); # sysuptime in milliseconds at end of flow
+has 'output'   => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # SNMP index of output interface
 has 'packets'  => (isa => 'UnsignedInt32Bit', is => 'ro', required => 1); # total number of packets in the flow
 has 'protocol' => (isa => 'UnsignedInt8Bit',  is => 'ro', required => 1); # IP protocol type
 has 'srcaddr'  => (isa => 'IPAddress',        is => 'ro', required => 1); # source IP address
+has 'srcmask'  => (isa => 'UnsignedInt8Bit',  is => 'ro', required => 1); # source address prefix mask bits
 has 'srcport'  => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # source TCP/UDP port
 has 'nexthop'  => (isa => 'IPAddress',        is => 'ro', required => 1); # IP address of next hop router
 has 'tcpflags' => (isa => 'UnsignedInt8Bit',  is => 'ro', required => 1); # Cumulative OR of tcp flags
 has 'tos'      => (isa => 'UnsignedInt8Bit',  is => 'ro', required => 1); # IP type of service
 has 'srcas'    => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # AS number of source
-has 'dstas'    => (isa => 'UnsignedInt16Bit', is => 'ro', required => 1); # AS number of destination
 
 __PACKAGE__->meta->make_immutable;
 
@@ -74,16 +78,20 @@ NetFlow::Data - Perl extension for Netflow version 5 flow data
                bytes    => $doctets,
                dstaddr  => $dstaddr,
                dstas    => $dst_as,
+               dstmask  => $dst_mask,
                dstport  => $dstport,
                first    => $first,
+               input    => $input,
                last     => $last,
                nexthop  => $nexthop,
+               output   => $output,
                packets  => $dpkts,
                protocol => $prot,
                tcpflags => $tcp_flags,
                tos      => $tos,
                srcaddr  => $srcaddr,
                srcas    => $src_as,
+               $srcmask => $src_mask,
                srcport  => $srcport,
              );
   # print total bytes in flow
@@ -109,6 +117,11 @@ Returns the destination IPv4 addresss in dotted quad notation.
 
 Returns the autonomous system number of the destination.
 
+=head2 dstmask
+
+Returns the destination address prefix mask bits. For example
+returns 24 for 192.168.1.0/24.
+
 =head2 dstport
 
 Returns the destination TCP/UDP port number.
@@ -117,19 +130,27 @@ Returns the destination TCP/UDP port number.
 
 Returns the system up time in milliseconds at the start of the flow.
 
+=head2 input
+
+Returns the SNMP index of the input interface.
+
 =head2 last
 
 Returns the system up time in milliseconds when the last packet of the flow was received.
 
 =head2 new
 
-Returns a new NetFlow::Data object. The parameters bytes, dstaddr, dstas, dstport,
-first, last, nexthop, packets, protocol, tcpflags, tos, srcaddr, srcas, and srcport
-are all required.
+Returns a new NetFlow::Data object. The parameters bytes, dstaddr, dstas, dstmask, dstport,
+first, input, last, nexthop, output, packets, protocol, tcpflags, tos, srcaddr, srcas, srcmask,
+and srcport are all required.
 
 =head2 nexthop
 
 Returns the IPv4 address of the next hop router in dotted quad notation.
+
+=head2 output
+
+Returns the SNMP index of the output interface.
 
 =head2 packets
 
@@ -146,6 +167,11 @@ Returns the source IPv4 addresss in dotted quad notation.
 =head2 srcas
 
 Returns the autonomous system number of the source.
+
+=head2 srcmask
+
+Returns the source address prefix mask bits. For example
+returns 24 for 192.168.1.0/24.
 
 =head2 srcport
 

@@ -13,8 +13,8 @@ use Test::Exception;
 BEGIN { use_ok('NetFlow::Data') };
 BEGIN { require_ok('NetFlow::Data') };
 
-my @methods = qw( bytes dstaddr dstas dstport first last new nexthop packets
-    protocol srcaddr srcas srcport tcpflags tos );
+my @methods = qw( bytes dstaddr dstas dstmask dstport first input last new nexthop output packets
+    protocol srcaddr srcas srcmask srcport tcpflags tos );
 
 can_ok('NetFlow::Data', @methods);
 
@@ -229,7 +229,63 @@ for my $number (@dstas_dies_data) {
 }
 $data = reset_data();
 
-#TODO: { };
+# Test srcmask
+my @srcmask_dies_data = qw(-1 a 256 1.1);
+for my $number (@srcmask_dies_data) {
+    $data->{srcmask} = $number;
+    dies_ok { NetFlow::Data->new( $data) }, "constructor dies $number srcmask";
+}
+$data = reset_data();
+
+for my $number (0..255) {
+    $data->{srcmask} = $number;
+    lives_ok { NetFlow::Data->new( $data ) }, "consturctor lives $number srcmask";
+}
+$data = reset_data();
+
+# Test dstmask
+my @dstmask_dies_data = qw ( -1 a 256 1.1);
+for my $number (@dstmask_dies_data) {
+    $data->{dstmask} = $number;
+    dies_ok { NetFlow::Data->new( $data ) }, "constructor dies $number dstmask";
+}
+$data = reset_data();
+
+for my $number (0..255) {
+    $data->{dstmask} = $number;
+    lives_ok { NetFlow::Data->new ( $data ) }, "constructor lives $number dstmask";
+}
+$data = reset_data();
+
+# Test input
+my @input_dies_data = qw( a 1.1 -1 65536 );
+for my $number (@input_dies_data) {
+    $data->{input} = $number;
+    dies_ok { NetFlow::Data->new( $data ) }, "constructor dies $number input";
+}
+$data = reset_data();
+
+my @input_lives_data = qw( 0 1 65535);
+for my $number (@input_lives_data) {
+    $data->{input} = $number;
+    lives_ok { NetFlow::Data->new( $data ) }, "constructor lives $number input";
+}
+$data = reset_data();
+
+# Test output
+my @output_dies_data = qw( a 1.1 -1 65536 );
+for my $number (@output_dies_data) {
+    $data->{output} = $number;
+    dies_ok { NetFlow::Data->new( $data ) }, "constructor dies $number output";
+}
+$data = reset_data();
+
+my @output_lives_data = qw( 0 1 65535);
+for my $number (@output_lives_data) {
+    $data->{output} = $number;
+    lives_ok { NetFlow::Data->new( $data ) }, "constructor lives $number output";
+}
+$data = reset_data();
 
 done_testing();
 
@@ -238,13 +294,17 @@ sub reset_data {
     bytes    => 5,
     dstaddr  => '192.168.1.1',
     dstas    => 1,
+    dstmask  => 1,
     dstport  => 80,
     first    => 1,
+    input    => 1,
     last     => 1,
     nexthop  => '192.168.1.1',
+    output   => 1,
     packets  => 1,
     protocol => 1,
     srcaddr  => '192.168.1.2',
+    srcmask  => 1,
     srcport  => 1099,
     srcas    => 1,
     tcpflags => 1,
