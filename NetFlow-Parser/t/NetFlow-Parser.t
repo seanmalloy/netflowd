@@ -1,16 +1,19 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl NetFlow-Parser.t'
 
-#########################
-
-# change 'tests => 1' to 'tests => last_test_to_print';
-
-use Test::More tests => 2;
+use strict;
+use warnings;
+use Test::More;
+use Test::Exception;
 BEGIN { use_ok('NetFlow::Parser') };
 BEGIN { require_ok('NetFlow::Parser') };
 
-#########################
+my @methods = qw ( new _read_header read_packet parse );
+can_ok('NetFlow::Parser', @methods);
 
-# Insert your test code below, the Test::More module is use()ed here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
+# TODO: test method new
+# TODO: test method _read_header
+# TODO: test method read_packet
+# TODO: test method parse
 
+done_testing();

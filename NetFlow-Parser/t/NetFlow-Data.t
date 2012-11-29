@@ -1,13 +1,8 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl NetFlow-Parser.t'
 
-#########################
-
-# change 'tests => 1' to 'tests => last_test_to_print';
-
 use strict;
 use warnings;
-
 use Test::More;
 use Test::Exception;
 BEGIN { use_ok('NetFlow::Data') };
@@ -15,7 +10,6 @@ BEGIN { require_ok('NetFlow::Data') };
 
 my @methods = qw( bytes dstaddr dstas dstmask dstport first input last new nexthop output packets
     protocol srcaddr srcas srcmask srcport tcpflags tos );
-
 can_ok('NetFlow::Data', @methods);
 
 my $data = reset_data();

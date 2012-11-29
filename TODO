@@ -1,9 +1,7 @@
 NetFlow Module Tasks
 --------------------
-* Finish the NetFlow::Parser::parse method.
 * Finish tests for NetFlow::Parser.
-* Update NetFlow::Data::tcpflags, NetFlow::Data::tos, NetFlow::Data::srcas,
-  NetFlow::Data::dstas with correct datatype. Also update corresponding tests.
+* Finailize header field lengths for NetFlow::Parser.
 
 SPM Module Tasks
 ----------------
