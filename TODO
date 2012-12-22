@@ -13,7 +13,6 @@ NetFlow Module Tasks
 
 SPM Module Tasks
 ----------------
-* Update module files from module-starter example.
 * Add tests for module correctness. (Test::Distrubution, Test::Kwalitee, Test::CheckManifest)
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
 

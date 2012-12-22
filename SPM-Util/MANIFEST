@@ -1,8 +1,12 @@
 Changes
-Makefile.PL
 MANIFEST
+Makefile.PL
 README
-t/SPM-Util-Num.t
-t/SPM-Exception.t
 lib/SPM/Util/Num.pm
 lib/SPM/Exception.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/SPM-Exception.t
+t/SPM-Util-Num.t
+
