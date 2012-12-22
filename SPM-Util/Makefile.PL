@@ -7,7 +7,7 @@ WriteMakefile(
     AUTHOR              => q{Sean Malloy <spinelli85@gmail.com>},
     VERSION_FROM        => 'lib/SPM/Util/Num.pm',
     ABSTRACT_FROM       => 'lib/SPM/Util/Num.pm',
-    LICENSE             => 'bsd'
+    LICENSE             => 'bsd',
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
