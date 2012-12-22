@@ -3,7 +3,7 @@ package NetFlow::Parser;
 use 5.010001;
 use Moose;
 use SPM::Util::Num qw(bin2dec bin2dottedquad);
-use NetFlow::Data;
+use NetFlow::Flow;
 our $VERSION = '0.01';
 
 use Moose::Util::TypeConstraints;
@@ -56,7 +56,7 @@ sub read_packet {
     $self->_read_header();
 }
 
-# returns: List of NetFlow::Data objects.
+# returns: List of NetFlow::Flow objects.
 sub parse {
     my $self = shift;
     if ($self->debug()) {
@@ -97,7 +97,7 @@ sub parse {
         $src_mask  = bin2dec($src_mask);
         $dst_mask  = bin2dec($dst_mask);
         $pad2      = bin2dec($pad2);
-        $flow = NetFlow::Data->new(
+        $flow = NetFlow::Flow->new(
             srcaddr  => $srcaddr,
             dstaddr  => $dstaddr,
             nexthop  => $nexthop,
@@ -214,8 +214,8 @@ NetFlow::Parser - Perl extension for Parsing Netflow version 5 data
 =head1 DESCRIPTION
 
 Object oriented module for parsing Netflow version 5 data.
-Returns Netflow data as NetFlow::Data objects. This module
-is meant to be used with NetFlow::Data.
+Returns Netflow data as NetFlow::Flow objects. This module
+is meant to be used with NetFlow::Flow and NetFlow::Packet.
 
 =head1 METHODS
 
@@ -233,7 +233,7 @@ TODO: document constructor arguements. Both optional and required.
 =head2 parse
 
 Parse binary Netflow data that has already been read with the
-read_packet() method. Returns a list of NetFlow::Data objects.
+read_packet() method. Returns a list of NetFlow::Flow objects.
 
 =head2 read_packet
 
@@ -242,7 +242,7 @@ Read in a binary Netflow version 5 packet.
 =head1 SEE ALSO
 
 Read the documentation for the Perl modules
-NetFlow::Data and Moose.
+NetFlow::Flow, NetFlow::Packet, and Moose.
 
 =head1 BUGS
 

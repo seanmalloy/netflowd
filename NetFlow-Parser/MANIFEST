@@ -2,10 +2,10 @@ Changes
 MANIFEST
 Makefile.PL
 README
-lib/NetFlow/Data.pm
+lib/NetFlow/Flow.pm
 lib/NetFlow/Parser.pm
 t/manifest.t
-t/NetFlow-Data.t
+t/NetFlow-Flow.t
 t/NetFlow-Parser.t
 t/pod-coverage.t
 t/pod.t

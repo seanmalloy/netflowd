@@ -2,11 +2,10 @@ NetFlow Module Tasks
 --------------------
 * Finish tests for NetFlow::Parser.
 * Finailize header field lengths for NetFlow::Parser.
-* Change NetFlow::Data to NetFlow::Flow
 * Create NetFlow::NetFlow::Packet (contains a list of NetFlow::Flow objects
   and the header information.
 * Update NetFlow::Parser to return a NetFlow::Packet object instead of a
-  NetFlow::Data object.
+  NetFlow::Flow object.
 * What does the the ignore.txt file do with ExtUtils::MakeMaker.
 * Add tests for module correctness. (Test::Distrubution, Test::Kwalitee, Test::CheckManifest)
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)

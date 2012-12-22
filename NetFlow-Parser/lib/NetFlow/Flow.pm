@@ -1,4 +1,4 @@
-package NetFlow::Data;
+package NetFlow::Flow;
 
 #use 5.010001;
 use Moose;
@@ -67,14 +67,14 @@ __PACKAGE__->meta->make_immutable;
 __END__
 =head1 NAME
 
-NetFlow::Data - Perl extension for Netflow version 5 flow data
+NetFlow::Flow - Perl extension for a Netflow version 5 flow
 
 =head1 SYNOPSIS
 
-  use NetFlow::Data;
+  use NetFlow::Flow;
 
   # create object
-  my $flow = NetFlow::Data->new(
+  my $flow = NetFlow::Flow->new(
                bytes    => $doctets,
                dstaddr  => $dstaddr,
                dstas    => $dst_as,
@@ -100,8 +100,8 @@ NetFlow::Data - Perl extension for Netflow version 5 flow data
 =head1 DESCRIPTION
 
 Object oriented module for storing and accessing Netflow version
-5 data. Only provides a constructor and accessor methods. This module
-is meant to be used with NetFlow::Parser.
+5 flow data. Only provides a constructor and accessor methods. This
+module is meant to be used with NetFlow::Packet and NetFlow::Parser.
 
 =head1 METHODS
 
@@ -140,7 +140,7 @@ Returns the system up time in milliseconds when the last packet of the flow was 
 
 =head2 new
 
-Returns a new NetFlow::Data object. The parameters bytes, dstaddr, dstas, dstmask, dstport,
+Returns a new NetFlow::Flow object. The parameters bytes, dstaddr, dstas, dstmask, dstport,
 first, input, last, nexthop, output, packets, protocol, tcpflags, tos, srcaddr, srcas, srcmask,
 and srcport are all required.
 
@@ -188,7 +188,7 @@ Returns the IP type of service.
 =head1 SEE ALSO
 
 Read the documentation for the Perl modules
-NetFlow::Parser and Moose.
+NetFlow::Packet, NetFlow::Parser, and Moose.
 
 =head1 BUGS
 
