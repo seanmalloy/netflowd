@@ -7,9 +7,7 @@ WriteMakefile(
     AUTHOR              => q{Sean Malloy <spinelli85@gmail.com>},
     VERSION_FROM        => 'lib/NetFlow/Parser.pm',
     ABSTRACT_FROM       => 'lib/NetFlow/Parser.pm',
-    ($ExtUtils::MakeMaker::VERSION >= 6.3002
-      ? ('LICENSE'=> 'bsd')
-      : ()),
+    'LICENSE'           => 'bsd',
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
