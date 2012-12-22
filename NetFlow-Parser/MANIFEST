@@ -1,6 +1,12 @@
 Changes
-Makefile.PL
 MANIFEST
+Makefile.PL
 README
-t/NetFlow-Parser.t
+lib/NetFlow/Data.pm
 lib/NetFlow/Parser.pm
+t/manifest.t
+t/NetFlow-Data.t
+t/NetFlow-Parser.t
+t/pod-coverage.t
+t/pod.t
+
