@@ -2,7 +2,7 @@ NetFlow Module Tasks
 --------------------
 * Finish tests for NetFlow::Parser.
 * Finailize header field lengths for NetFlow::Parser.
-* Create NetFlow::NetFlow::Packet (contains a list of NetFlow::Flow objects
+* Create NetFlow::Packet (contains a list of NetFlow::Flow objects
   and the header information.
 * Update NetFlow::Parser to return a NetFlow::Packet object instead of a
   NetFlow::Flow object.
