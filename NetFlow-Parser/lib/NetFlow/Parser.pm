@@ -3,62 +3,16 @@ package NetFlow::Parser;
 use 5.010001;
 use Moose;
 use SPM::Util::Num qw(bin2dec bin2dottedquad);
-use NetFlow::Flow;
+use NetFlow::Packet;
 our $VERSION = '0.01';
 
-use Moose::Util::TypeConstraints;
+has 'debug' => (isa => 'Int', is => 'rw', required => 0); # Set to non-zero to enable debugging
 
-subtype 'NetflowVersion'
-    => as 'Int'
-    => where { $_ eq 5 }
-    => message { "Only support Netflow version 5" };
-
-subtype 'FlowCount'
-    => as 'UnsignedInt'
-    => where { $_ < 31 }
-    => message { "Invalid flow count($_). Must be between 0 and 30" };
-
-subtype 'BinaryString'
-    => as 'Str',
-    => where { $_ =~ /^[0-1]+$/ }
-    => message { "($_) is not a string of 0's and 1's" };
-
-subtype 'UnsignedInt6Bit'
-    => as 'UnsignedInt',
-    => where { $_ < 64 }
-    => message { "Number ($_) is not less than 64" };
-
-subtype 'UnsignedInt2Bit'
-    => as 'UnsignedInt',
-    => where { $_ < 4 }
-    => message { "Number ($_) is not less than 4" };
-
-no Moose::Util::TypeConstraints;
-
-has 'raw_data'          => (isa => 'Any',              is => 'rw', required => 0); # Raw binary Netflow packet
-has 'raw_flows'         => (isa => 'BinaryString',     is => 'rw', required => 0); # String of 0's and 1's representing Netflow flows (no header)
-has 'version'           => (isa => 'NetflowVersion',   is => 'rw', required => 0); # Netflow version number (only support version 5)
-has 'count'             => (isa => 'FlowCount',        is => 'rw', required => 0); # number of flows in the packet
-has 'sys_uptime'        => (isa => 'UnsignedInt32Bit', is => 'rw', required => 0); # milliseconds since the export device booted
-has 'unix_secs'         => (isa => 'UnsignedInt32Bit', is => 'rw', required => 0); # seconds since Unix epoch
-has 'unix_nsecs'        => (isa => 'UnsignedInt32Bit', is => 'rw', required => 0); # residual nanoseconds since Unix epoch
-has 'flow_sequence'     => (isa => 'UnsignedInt32Bit', is => 'rw', required => 0); # sequence counter of total flows seen
-has 'engine_type'       => (isa => 'UnsignedInt8Bit',  is => 'rw', required => 0); # type of flow-switching engine
-has 'engine_id'         => (isa => 'UnsignedInt8Bit',  is => 'rw', required => 0); # slot number of the flow-switching engine
-has 'sampling_mode'     => (isa => 'UnsignedInt2Bit',  is => 'rw', required => 0); # two bit sampling mode
-has 'sampling_interval' => (isa => 'UnsignedInt6Bit',  is => 'rw', required => 0); # TODO: this should be 14 bits, according to the Cisco Netflow docs
-has 'debug'             => (isa => 'UnsignedInt', is => 'rw', required => 1, default => 0); # set to > 0 enable debug, set to 0 turn off debug
-
-sub read_packet {
+# returns: NetFlow::Packet object.
+sub parse {
     my $self   = shift;
     my $packet = shift;
-    $self->raw_data($packet);
-    $self->_read_header();
-}
-
-# returns: List of NetFlow::Flow objects.
-sub parse {
-    my $self = shift;
+    my %header = $self->_read_header($packet);
     if ($self->debug()) {
         warn "##### Start Parse #####";
     }
@@ -67,8 +21,8 @@ sub parse {
     my $flow;
     my $flow_string;
     my @flows;
-    for (1..$self->count()) {
-        $flow_string = substr($self->raw_flows(), $offset, 384); # 384 = number of bits in a flow record
+    for (1..$header{count}) {
+        $flow_string = substr($header{flow_data}, $offset, 384); # 384 = number of bits in a flow record
         if ($self->debug()) {
             warn "Length of Flow Record in Bits: " . length($flow_string);
         }
@@ -147,24 +101,37 @@ sub parse {
     if ($self->debug()) {
         warn "##### End Parse #####";
     }
-    return @flows;
+    return NetFlow::Packet->new(
+        version           => $header{version},
+        count             => $header{count},
+        sys_uptime        => $header{sys_uptime},
+        unix_secs         => $header{unix_secs},
+        unix_nsecs        => $header{unix_nsecs},
+        flow_sequence     => $header{flow_sequence},
+        engine_type       => $header{engine_type},
+        engine_id         => $header{engine_id},
+        sampling_mode     => $header{sampling_mode},
+        sampling_interval => $header{sampling_interval},
+        flows             => [ @flows ],
+    );
 }
 
 # START
 # TODO: according to Netflow docs
 # the sample interval should be 14 bits
 sub _read_header {
-    my $self = shift;
-    my ($version,       $count,             $sysuptime,   $unix_secs,
+    my $self       = shift;
+    my $raw_packet = shift;
+    my ($version,       $count,             $sys_uptime,  $unix_secs,
         $unix_nsecs,    $flow_sequence,     $engine_type, $engine_id,
-        $sampling_mode, $sampling_interval, $flows) =
-            unpack('n1n1N1N1N1N1B8B8B2B6B*', $self->raw_data()); # TODO - does this work on little and big endian?
+        $sampling_mode, $sampling_interval, $flow_data) =
+            unpack('n1n1N1N1N1N1B8B8B2B6B*', $raw_packet); # TODO - does this work on little and big endian?
 
     if ($self->debug()) {
         warn "##### Start Parse Header #####";
         warn "Version: $version";
         warn "Count: $count";
-        warn "Sysuptime: $sysuptime";
+        warn "Sysuptime: $sys_uptime";
         warn "Unix_Secs: $unix_secs";
         warn "Unix NSencs: $unix_nsecs";
         warn "Flow Seq: $flow_sequence";
@@ -172,27 +139,38 @@ sub _read_header {
         warn "Engine ID: $engine_id";
         warn "Sampling Mode: $sampling_mode";
         warn "Sampleing Interval: $sampling_interval";
-        warn "Raw Flow Data Length(bits): " . length($flows);
+        warn "Raw Flow Data Length(bits): " . length($flow_data);
         warn "##### End Parse Header #####";
     }
 
     # Validate length of all flow records. Each flow
     # record should be 384 bits.
-    if ( length $flows ne (384 * $count) ) {
+    if ( length $flow_data != (384 * $count) ) {
         die "parse error: invalid flow record length";  # TODO: throw different exception 
     }
 
-    $self->version($version);
-    $self->count($count);
-    $self->sys_uptime($sysuptime);
-    $self->unix_secs($unix_secs);
-    $self->unix_nsecs($unix_nsecs);
-    $self->flow_sequence($flow_sequence);
-    $self->engine_type(bin2dec($engine_type));
-    $self->engine_id(bin2dec($engine_id));
-    $self->sampling_mode(bin2dec($sampling_mode));
-    $self->sampling_interval(bin2dec($sampling_interval));
-    $self->raw_flows($flows);
+    # Only support Netflow version 5
+    if ($version != 5) {
+        die "Unknown Netflow version: $version. only supports Netflow version 5"; # TODO: throw different exception
+    }
+    
+    $engine_type       = bin2dec($engine_type);
+    $engine_id         = bin2dec($engine_id);
+    $sampling_mode     = bin2dec($sampling_mode);
+    $sampling_interval = bin2dec($sampling_interval);
+    my %header = { version           => $version,
+                   count             => $count,
+                   sys_uptime        => $sys_uptime,
+                   unix_secs         => $unix_secs,
+                   unix_nsecs        => $unix_nsecs,
+                   flow_sequence     => $flow_sequence,
+                   engine_type       => $engine_type,
+                   engine_id         => $engine_id,
+                   sampling_mode     => $sampling_mode,
+                   sampling_interval => $sampling_interval,
+                   flow_data         => $flow_data
+                 };
+    return %header;
 }
 
 __PACKAGE__->meta->make_immutable;

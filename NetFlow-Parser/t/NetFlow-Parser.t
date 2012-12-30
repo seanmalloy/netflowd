@@ -4,7 +4,7 @@ use Test::More;
 use Test::Exception;
 BEGIN { use_ok('NetFlow::Parser') };
 
-my @methods = qw ( new _read_header read_packet parse );
+my @methods = qw ( new _read_header parse );
 can_ok('NetFlow::Parser', @methods);
 
 # TODO: test method new
