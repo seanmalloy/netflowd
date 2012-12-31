@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 1455;
+use Test::More tests => 1456;
 use Test::Exception;
 BEGIN { use_ok('NetFlow::Flow') };
 
@@ -13,6 +13,7 @@ can_ok($module, "dstport");
 can_ok($module, "first");
 can_ok($module, "input");
 can_ok($module, "last");
+can_ok($module, "new");
 can_ok($module, "output");
 can_ok($module, "packets");
 can_ok($module, "protocol");
