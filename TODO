@@ -2,14 +2,12 @@ NetFlow Module Tasks
 --------------------
 * Finish tests for NetFlow::Parser.
 * Review tests for NetFlow::Packet.
-* Review tests for NetFlow::Flow.
 * Finailize header field lengths for NetFlow::Packet and NetFlow::Parser.
 * What does the the ignore.txt file do with ExtUtils::MakeMaker???
 * Add tests for module correctness. (Test::Distrubution, Test::Kwalitee)
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
 * Review POD documentation for NetFlow::Parser.
 * Review POD documentation for NetFlow::Packet.
-* Review POD documentation for NetFlow::Flow.
 * Replace all die statements with exceptions.
 
 SPM Module Tasks

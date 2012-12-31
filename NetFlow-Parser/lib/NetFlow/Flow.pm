@@ -67,7 +67,7 @@ __PACKAGE__->meta->make_immutable;
 __END__
 =head1 NAME
 
-NetFlow::Flow - Perl extension for a Netflow version 5 flow
+NetFlow::Flow - Perl extension for Netflow version 5 flow data
 
 =head1 SYNOPSIS
 
@@ -91,11 +91,28 @@ NetFlow::Flow - Perl extension for a Netflow version 5 flow
                tos      => $tos,
                srcaddr  => $srcaddr,
                srcas    => $src_as,
-               $srcmask => $src_mask,
+               srcmask  => $src_mask,
                srcport  => $srcport,
              );
-  # print total bytes in flow
+  # Access data from object.
   print $flow->bytes(), "\n";
+  print $flow->dstaddr(), "\n";
+  print $flow->dstas(), "\n";
+  print $flow->dstmask(), "\n";
+  print $flow->dstport(), "\n";
+  print $flow->first(), "\n";
+  print $flow->input(), "\n";
+  print $flow->last(), "\n";
+  print $flow->nexthop(), "\n";
+  print $flow->output(), "\n";
+  print $flow->packets(), "\n";
+  print $flow->protocol(), "\n";
+  print $flow->tcpflags(), "\n";
+  print $flow->tos(), "\n";
+  print $flow->srcaddr(), "\n";
+  print $flow->srcas(), "\n";
+  print $flow->srcmask(), "\n";
+  print $flow->srcport(), "\n";
 
 =head1 DESCRIPTION
 
@@ -158,7 +175,7 @@ Returns the total number of packets in the flow.
 
 =head2 protocol
 
-Returns the IP protocol type. For Example TCP is 6 and UDP is 17.
+Returns the IP protocol type. For example returns 6 for TCP and 17 for UDP.
 
 =head2 srcaddr
 
@@ -188,7 +205,7 @@ Returns the IP type of service.
 =head1 SEE ALSO
 
 Read the documentation for the Perl modules
-NetFlow::Packet, NetFlow::Parser, and Moose.
+NetFlow::Packet and NetFlow::Parser.
 
 =head1 BUGS
 
