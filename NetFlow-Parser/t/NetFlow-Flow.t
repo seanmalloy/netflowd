@@ -46,24 +46,24 @@ is($obj->tcpflags(), 1, 'tcpflags accessor');
 is($obj->tos(), 1, 'tos accessor');
 
 # Test that methods used as setters die
-dies_ok { $obj->bytes(1) } "bytes setter method dies";
-dies_ok { $obj->dstas(1) } "dstas setter method dies";
-dies_ok { $obj->dstaddr(1) } "dstaddr setter method dies";
-dies_ok { $obj->dstmask(1) } "dstmask setter method dies";
-dies_ok { $obj->dstport(1) } "dstport setter method dies";
-dies_ok { $obj->first(1) } "first setter method dies";
-dies_ok { $obj->input(1) } "input setter method dies";
-dies_ok { $obj->last(1) } "last setter method dies";
-dies_ok { $obj->output(1) } "output setter method dies";
-dies_ok { $obj->packets(1) } "packets setter method dies";
+dies_ok { $obj->bytes(1)    } "bytes setter method dies";
+dies_ok { $obj->dstas(1)    } "dstas setter method dies";
+dies_ok { $obj->dstaddr(1)  } "dstaddr setter method dies";
+dies_ok { $obj->dstmask(1)  } "dstmask setter method dies";
+dies_ok { $obj->dstport(1)  } "dstport setter method dies";
+dies_ok { $obj->first(1)    } "first setter method dies";
+dies_ok { $obj->input(1)    } "input setter method dies";
+dies_ok { $obj->last(1)     } "last setter method dies";
+dies_ok { $obj->output(1)   } "output setter method dies";
+dies_ok { $obj->packets(1)  } "packets setter method dies";
 dies_ok { $obj->protocol(1) } "protocol setter method dies";
-dies_ok { $obj->srcaddr(1) } "srcaddr setter method dies";
-dies_ok { $obj->srcmask(1) } "srcmask setter method dies";
-dies_ok { $obj->srcport(1) } "srcport setter method dies";
-dies_ok { $obj->nexthop(1) } "nexthop setter method dies";
+dies_ok { $obj->srcaddr(1)  } "srcaddr setter method dies";
+dies_ok { $obj->srcmask(1)  } "srcmask setter method dies";
+dies_ok { $obj->srcport(1)  } "srcport setter method dies";
+dies_ok { $obj->nexthop(1)  } "nexthop setter method dies";
 dies_ok { $obj->tcpflags(1) } "tcpflags setter method dies";
-dies_ok { $obj->tos(1) } "tos setter method dies";
-dies_ok { $obj->srcas(1) } "srcas setter method dies";
+dies_ok { $obj->tos(1)      } "tos setter method dies";
+dies_ok { $obj->srcas(1)    } "srcas setter method dies";
 
 # Test bytes.
 $data->{bytes} = -1;
@@ -315,25 +315,25 @@ for my $number (@output_lives_data) {
 $data = reset_data();
 
 sub reset_data {
-    my $reset_data = {
-    bytes    => 5,
-    dstaddr  => '192.168.1.1',
-    dstas    => 1,
-    dstmask  => 1,
-    dstport  => 80,
-    first    => 1,
-    input    => 1,
-    last     => 1,
-    nexthop  => '192.168.1.1',
-    output   => 1,
-    packets  => 1,
-    protocol => 1,
-    srcaddr  => '192.168.1.2',
-    srcmask  => 1,
-    srcport  => 1099,
-    srcas    => 1,
-    tcpflags => 1,
-    tos      => 1 };
+    my $reset_data = { bytes    => 5,
+                       dstaddr  => '192.168.1.1',
+                       dstas    => 1,
+                       dstmask  => 1,
+                       dstport  => 80,
+                       first    => 1,
+                       input    => 1,
+                       last     => 1,
+                       nexthop  => '192.168.1.1',
+                       output   => 1,
+                       packets  => 1,
+                       protocol => 1,
+                       srcaddr  => '192.168.1.2',
+                       srcmask  => 1,
+                       srcport  => 1099,
+                       srcas    => 1,
+                       tcpflags => 1,
+                       tos      => 1,
+                     };
     return $reset_data;
 }
 
