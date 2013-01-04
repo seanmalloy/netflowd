@@ -21,10 +21,12 @@ can_ok($module, 'version');
 
 my $packet_data = reset_data();
 
+# Test consturctor.
 new_ok($module => [ $packet_data ]);
+my $packet = $module->new($packet_data);
+isa_ok($packet, $module);
 
 # Read only methods die when using as setters.
-my $packet = $module->new($packet_data);
 dies_ok { $packet->count(0)             } 'NetFlow::Packet->count dies as setter method';
 dies_ok { $packet->flow_sequence(0)     } 'NetFlow::Packet->flow_sequence dies as setter method';
 dies_ok { $packet->engine_id(0)         } 'NetFlow::Packet->engine_id dies as setter method';
@@ -36,7 +38,33 @@ dies_ok { $packet->unix_nsecs(0)        } 'NetFlow::Packet->unix_nsecs dies as s
 dies_ok { $packet->unix_secs(0)         } 'NetFlow::Packet->unix_secs dies as setter method';
 dies_ok { $packet->version(0)           } 'NetFlow::Packet->version dies as setter method';
 
-# TODO: read/write methods should not die when using as setters (only flows method)
+# Accessor methods live.
+lives_ok { $packet->count()             } 'NetFlow::Packet->count accessor lives';
+lives_ok { $packet->flow_sequence()     } 'NetFlow::Packet->flow_sequence accessor lives';
+lives_ok { $packet->engine_id()         } 'NetFlow::Packet->engine_id accessor lives';
+lives_ok { $packet->engine_type()       } 'NetFlow::Packet->engine_type accessor lives';
+lives_ok { $packet->sampling_interval() } 'NetFlow::Packet->sampling_interval accessor lives';
+lives_ok { $packet->sampling_mode()     } 'NetFlow::Packet->sampling_mode accessor lives';
+lives_ok { $packet->sys_uptime()        } 'NetFlow::Packet->sys_uptime accessor lives';
+lives_ok { $packet->unix_nsecs()        } 'NetFlow::Packet->unix_nsecs accessor lives';
+lives_ok { $packet->unix_secs()         } 'NetFlow::Packet->unix_secs accessor lives';
+lives_ok { $packet->version()           } 'NetFlow::Packet->version accessor lives';
+lives_ok { $packet->flows()             } 'NetFlow::Packet->flows accessor lives';
+
+# TODO: Accessor methods return correct value.
+is ( $packet->count(),             1,          'NetFlow::Packet->count accessor returns correct value'             );
+is ( $packet->flow_sequence(),     37,         'NetFlow::Packet->flow_sequence accessor returns correct value'     );
+is ( $packet->engine_id(),         0,          'NetFlow::Packet->engine_id accessor returns correct value'         );
+is ( $packet->engine_type(),       0,          'NetFlow::Packet->engine_type accessor returns correct value'       );
+is ( $packet->sampling_interval(), 1 ,         'NetFlow::Packet->sampling_interval accessor returns correct value' );
+is ( $packet->sampling_mode(),     2,          'NetFlow::Packet->sampling_mode accessor returns correct value'     );
+is ( $packet->sys_uptime(),        1000,       'NetFlow::Packet->sys_uptime accessor returns correct value'        );
+is ( $packet->unix_nsecs(),        1,          'NetFlow::Packet->unix_nsecs accessor returns correct value'        );
+is ( $packet->unix_secs(),         1357183150, 'NetFlow::Packet->unix_secs accessor returns correct value'         );
+is ( $packet->version(),           5,          'NetFlow::Packet->version accessor returns correct value'           );
+# is ( $packet->flows()             );    # TODO
+
+# TODO: read/write methods should live when using as setters (only flows method)
 # TODO: constructor should die whith invalid input
 #     version
 #     count
