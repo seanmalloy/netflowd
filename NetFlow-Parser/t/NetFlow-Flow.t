@@ -1,69 +1,74 @@
 use strict;
 use warnings;
-use Test::More tests => 1456;
+use Test::More tests => 1457;
 use Test::Exception;
 BEGIN { use_ok('NetFlow::Flow') };
 
 my $module = "NetFlow::Flow";
-can_ok($module, "bytes");
-can_ok($module, "dstas");
-can_ok($module, "dstaddr");
-can_ok($module, "dstmask");
-can_ok($module, "dstport");
-can_ok($module, "first");
-can_ok($module, "input");
-can_ok($module, "last");
-can_ok($module, "new");
-can_ok($module, "output");
-can_ok($module, "packets");
-can_ok($module, "protocol");
-can_ok($module, "srcaddr");
-can_ok($module, "srcmask");
-can_ok($module, "srcport");
-can_ok($module, "nexthop");
-can_ok($module, "tcpflags");
-can_ok($module, "tos");
-can_ok($module, "srcas");
+
+# Module can run these methods.
+can_ok($module, 'bytes');
+can_ok($module, 'dstas');
+can_ok($module, 'dstaddr');
+can_ok($module, 'dstmask');
+can_ok($module, 'dstport');
+can_ok($module, 'first');
+can_ok($module, 'input');
+can_ok($module, 'last');
+can_ok($module, 'new');
+can_ok($module, 'output');
+can_ok($module, 'packets');
+can_ok($module, 'protocol');
+can_ok($module, 'srcaddr');
+can_ok($module, 'srcmask');
+can_ok($module, 'srcport');
+can_ok($module, 'nexthop');
+can_ok($module, 'tcpflags');
+can_ok($module, 'tos');
+can_ok($module, 'srcas');
 
 my $data = reset_data();
 
+# Test constructor with valid input.
 new_ok($module => [ $data ]);
-
 my $obj = $module->new( $data );
-is($obj->bytes(), 5, 'bytes accessor');
-is($obj->dstaddr(), '192.168.1.1', 'dstaddr accessor');
-is($obj->dstas(), 1, 'dstas accessor');
-is($obj->dstport(), 80, 'dstport accessor');
-is($obj->first(), 1, 'first accessor');
-is($obj->last(), 1, 'last accessor');
-is($obj->nexthop(), '192.168.1.1', 'nexthop accessor');
-is($obj->packets(), 1, 'packets accessor');
-is($obj->protocol(), 1, 'protocol accessor');
-is($obj->srcaddr(), '192.168.1.2', 'srcaddr accessor');
-is($obj->srcas(), 1, 'srcas accessor');
-is($obj->srcport(), 1099, 'srcport accessor');
-is($obj->tcpflags(), 1, 'tcpflags accessor');
-is($obj->tos(), 1, 'tos accessor');
+isa_ok($obj, 'NetFlow::Flow');
 
-# Test that methods used as setters die
-dies_ok { $obj->bytes(1)    } "bytes setter method dies";
-dies_ok { $obj->dstas(1)    } "dstas setter method dies";
-dies_ok { $obj->dstaddr(1)  } "dstaddr setter method dies";
-dies_ok { $obj->dstmask(1)  } "dstmask setter method dies";
-dies_ok { $obj->dstport(1)  } "dstport setter method dies";
-dies_ok { $obj->first(1)    } "first setter method dies";
-dies_ok { $obj->input(1)    } "input setter method dies";
-dies_ok { $obj->last(1)     } "last setter method dies";
-dies_ok { $obj->output(1)   } "output setter method dies";
-dies_ok { $obj->packets(1)  } "packets setter method dies";
-dies_ok { $obj->protocol(1) } "protocol setter method dies";
-dies_ok { $obj->srcaddr(1)  } "srcaddr setter method dies";
-dies_ok { $obj->srcmask(1)  } "srcmask setter method dies";
-dies_ok { $obj->srcport(1)  } "srcport setter method dies";
-dies_ok { $obj->nexthop(1)  } "nexthop setter method dies";
-dies_ok { $obj->tcpflags(1) } "tcpflags setter method dies";
-dies_ok { $obj->tos(1)      } "tos setter method dies";
-dies_ok { $obj->srcas(1)    } "srcas setter method dies";
+# Read only methods die when used as setters.
+dies_ok { $obj->bytes(1)    } "NetFlow::Flow->bytes dies as setter method";
+dies_ok { $obj->dstas(1)    } "NetFlow::Flow->dstas dies as setter method";
+dies_ok { $obj->dstaddr(1)  } "NetFlow::Flow->dstaddr dies as setter method";
+dies_ok { $obj->dstmask(1)  } "NetFlow::Flow->dstmask dies as setter method";
+dies_ok { $obj->dstport(1)  } "NetFlow::Flow->dstport dies as setter method";
+dies_ok { $obj->first(1)    } "NetFlow::Flow->first dies as setter method";
+dies_ok { $obj->input(1)    } "NetFlow::Flow->input dies as setter method";
+dies_ok { $obj->last(1)     } "NetFlow::Flow->last dies as setter method";
+dies_ok { $obj->output(1)   } "NetFlow::Flow->output dies as setter method";
+dies_ok { $obj->packets(1)  } "NetFlow::Flow->packets dies as setter method";
+dies_ok { $obj->protocol(1) } "NetFlow::Flow->protocol dies as setter method";
+dies_ok { $obj->srcaddr(1)  } "NetFlow::Flow->srcaddr dies as setter method";
+dies_ok { $obj->srcmask(1)  } "NetFlow::Flow->srcmask dies as setter method";
+dies_ok { $obj->srcport(1)  } "NetFlow::Flow->srcport dies as setter method";
+dies_ok { $obj->nexthop(1)  } "NetFlow::Flow->nexthop dies as setter method";
+dies_ok { $obj->tcpflags(1) } "NetFlow::Flow->tcpflags dies as setter method";
+dies_ok { $obj->tos(1)      } "NetFlow::Flow->tos dies as setter method";
+dies_ok { $obj->srcas(1)    } "NetFlow::Flow->srcas dies as setter method";
+
+# Accessor methods return correct value.
+cmp_ok ( $obj->bytes(),    '==', 5,    'NetFlow::Flow->bytes accessor retuns correct value'    );
+cmp_ok ( $obj->dstas(),    '==', 1,    'NetFlow::Flow->dstas accessor retuns correct value'    );
+cmp_ok ( $obj->dstport(),  '==', 80,   'NetFlow::Flow->dstport accessor retuns correct value'  );
+cmp_ok ( $obj->first(),    '==', 1,    'NetFlow::Flow->first accessor retuns correct value'    );
+cmp_ok ( $obj->last(),     '==', 1,    'NetFlow::Flow->last accessor retuns correct value'     );
+cmp_ok ( $obj->packets(),  '==', 1,    'NetFlow::Flow->packets accessor retuns correct value'  );
+cmp_ok ( $obj->protocol(), '==', 1,    'NetFlow::Flow->protocol accessor retuns correct value' );
+cmp_ok ( $obj->srcas(),    '==', 1,    'NetFlow::Flow->srcas accessor retuns correct value'    );
+cmp_ok ( $obj->srcport(),  '==', 1099, 'NetFlow::Flow->srcport accessor retuns correct value'  );
+cmp_ok ( $obj->tcpflags(), '==', 1,    'NetFlow::Flow->tcpflags accessor retuns correct value' );
+cmp_ok ( $obj->tos(),      '==', 1,    'NetFlow::Flow->tos accessor retuns correct value'      );
+is ( $obj->dstaddr(), '192.168.1.1', 'NetFlow::Flow->dstaddr accessor retuns correct value' );
+is ( $obj->nexthop(), '192.168.1.1', 'NetFlow::Flow->nexthop accessor retuns correct value' );
+is ( $obj->srcaddr(), '192.168.1.2', 'NetFlow::Flow->srcaddr accessor retuns correct value' );
 
 # Test bytes.
 $data->{bytes} = -1;
