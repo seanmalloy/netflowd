@@ -2,6 +2,7 @@ package NetFlow::Packet;
 
 #use 5.010001;
 use Moose;
+use NetFlow::Flow;
 
 our $VERSION = '0.01';
 
@@ -39,12 +40,16 @@ no Moose::Util::TypeConstraints;
 # TODO: should flows be ro OR rw?
 # TODO: should there be methods to add/remove flows?
 
+# Note: According to Cisco Netflow docs the sample interval should be 14 bits. The
+# OpenBSD if_pflow.h file sets sampling mode and sampling interval to 8 bit total. Need
+# to read appropriate RFC fro find the "correct" length of the sampling interval field.
+
 has 'count'             => (isa => 'FlowCount',               is => 'ro', required => 1); # number of flows in the packet
 has 'engine_id'         => (isa => 'UnsignedInt8Bit',         is => 'ro', required => 1); # slot number of the flow-switching engine
 has 'engine_type'       => (isa => 'UnsignedInt8Bit',         is => 'ro', required => 1); # type of flow-switching engine
 has 'flow_sequence'     => (isa => 'UnsignedInt32Bit',        is => 'ro', required => 1); # sequence counter of total flows seen
 has 'flows'             => (isa => 'ArrayRef[NetFlow::Flow]', is => 'rw', required => 0); # ArrayRef of NetFlow::Flows
-has 'sampling_interval' => (isa => 'UnsignedInt6Bit',         is => 'ro', required => 1); # TODO: this should be 14 bits, according to the Cisco Netflow docs
+has 'sampling_interval' => (isa => 'UnsignedInt6Bit',         is => 'ro', required => 1); # six bit sampling interval
 has 'sampling_mode'     => (isa => 'UnsignedInt2Bit',         is => 'ro', required => 1); # two bit sampling mode
 has 'sys_uptime'        => (isa => 'UnsignedInt32Bit',        is => 'ro', required => 1); # milliseconds since the export device booted
 has 'unix_nsecs'        => (isa => 'UnsignedInt32Bit',        is => 'ro', required => 1); # residual nanoseconds since Unix epoch
