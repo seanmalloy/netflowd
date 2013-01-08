@@ -4,6 +4,7 @@ use 5.010001;
 use Moose;
 use SPM::Util::Num qw(bin2dec bin2dottedquad);
 use NetFlow::Packet;
+use NetFlow::Flow;
 our $VERSION = '0.01';
 
 has 'debug' => (isa => 'Int', is => 'rw', required => 0); # Set to non-zero to enable debugging
@@ -117,8 +118,9 @@ sub parse {
 }
 
 # START
-# TODO: according to Netflow docs
-# the sample interval should be 14 bits
+# Note: According to Cisco Netflow docs the sample interval should be 14 bits. The
+# OpenBSD if_pflow.h file sets sampling mode and sampling interval to 8 bit total. Need
+# to read appropriate RFC fro find the "correct" length of the sampling interval field.
 sub _read_header {
     my $self       = shift;
     my $raw_packet = shift;
@@ -158,7 +160,7 @@ sub _read_header {
     $engine_id         = bin2dec($engine_id);
     $sampling_mode     = bin2dec($sampling_mode);
     $sampling_interval = bin2dec($sampling_interval);
-    my %header = { version           => $version,
+    my %header = ( version           => $version,
                    count             => $count,
                    sys_uptime        => $sys_uptime,
                    unix_secs         => $unix_secs,
@@ -168,8 +170,8 @@ sub _read_header {
                    engine_id         => $engine_id,
                    sampling_mode     => $sampling_mode,
                    sampling_interval => $sampling_interval,
-                   flow_data         => $flow_data
-                 };
+                   flow_data         => $flow_data,
+                 );
     return %header;
 }
 
