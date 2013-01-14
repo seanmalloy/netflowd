@@ -87,14 +87,15 @@ NetFlow::Flow - Perl extension for Netflow version 5 flow data
                output   => $output,
                packets  => $dpkts,
                protocol => $prot,
-               tcpflags => $tcp_flags,
-               tos      => $tos,
                srcaddr  => $srcaddr,
                srcas    => $src_as,
                srcmask  => $src_mask,
                srcport  => $srcport,
+               tcpflags => $tcp_flags,
+               tos      => $tos,
              );
-  # Access data from object.
+
+  # access data from object
   print $flow->bytes(), "\n";
   print $flow->dstaddr(), "\n";
   print $flow->dstas(), "\n";
@@ -107,12 +108,12 @@ NetFlow::Flow - Perl extension for Netflow version 5 flow data
   print $flow->output(), "\n";
   print $flow->packets(), "\n";
   print $flow->protocol(), "\n";
-  print $flow->tcpflags(), "\n";
-  print $flow->tos(), "\n";
   print $flow->srcaddr(), "\n";
   print $flow->srcas(), "\n";
   print $flow->srcmask(), "\n";
   print $flow->srcport(), "\n";
+  print $flow->tcpflags(), "\n";
+  print $flow->tos(), "\n";
 
 =head1 DESCRIPTION
 
@@ -204,7 +205,7 @@ Returns the IP type of service.
 
 =head1 SEE ALSO
 
-Read the documentation for the Perl modules
+Read the documentation for Perl modules
 NetFlow::Packet and NetFlow::Parser.
 
 =head1 BUGS
