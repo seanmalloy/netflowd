@@ -1,6 +1,6 @@
 package NetFlow::Parser;
 
-use 5.010001;
+#use 5.010001;
 use Moose;
 use SPM::Util::Num qw(bin2dec bin2dottedquad);
 use NetFlow::Packet;
