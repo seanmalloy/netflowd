@@ -6,7 +6,7 @@ use NetFlow::Flow;
 
 our $VERSION = '0.01';
 
-# Only works with NetFlow V5.
+# Only works with Netflow V5.
 
 use Moose::Util::TypeConstraints;
 
@@ -172,7 +172,7 @@ Returns in the numbers of seconds since the Unix epoch.
 
 =head2 version
 
-Returns the NetFlow version number.
+Returns the Netflow version number.
 
 =head1 SEE ALSO
 

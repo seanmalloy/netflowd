@@ -5,7 +5,7 @@ use Moose;
 
 our $VERSION = '0.01';
 
-# Only works with NetFlow V5.
+# Only works with Netflow V5.
 
 use Moose::Util::TypeConstraints;
 
