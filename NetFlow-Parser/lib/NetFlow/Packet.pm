@@ -37,18 +37,15 @@ subtype 'UnsignedInt2Bit'
 
 no Moose::Util::TypeConstraints;
 
-# TODO: should flows be ro OR rw?
-# TODO: should there be methods to add/remove flows?
-
 # Note: According to Cisco Netflow docs the sample interval should be 14 bits. The
 # OpenBSD if_pflow.h file sets sampling mode and sampling interval to 8 bit total. Need
-# to read appropriate RFC fro find the "correct" length of the sampling interval field.
+# to read appropriate RFC to find the "correct" length of the sampling interval field.
 
 has 'count'             => (isa => 'FlowCount',               is => 'ro', required => 1); # number of flows in the packet
 has 'engine_id'         => (isa => 'UnsignedInt8Bit',         is => 'ro', required => 1); # slot number of the flow-switching engine
 has 'engine_type'       => (isa => 'UnsignedInt8Bit',         is => 'ro', required => 1); # type of flow-switching engine
 has 'flow_sequence'     => (isa => 'UnsignedInt32Bit',        is => 'ro', required => 1); # sequence counter of total flows seen
-has 'flows'             => (isa => 'ArrayRef[NetFlow::Flow]', is => 'rw', required => 0); # ArrayRef of NetFlow::Flows
+has 'flows'             => (isa => 'ArrayRef[NetFlow::Flow]', is => 'ro', required => 1); # ArrayRef of NetFlow::Flows
 has 'sampling_interval' => (isa => 'UnsignedInt6Bit',         is => 'ro', required => 1); # six bit sampling interval
 has 'sampling_mode'     => (isa => 'UnsignedInt2Bit',         is => 'ro', required => 1); # two bit sampling mode
 has 'sys_uptime'        => (isa => 'UnsignedInt32Bit',        is => 'ro', required => 1); # milliseconds since the export device booted
@@ -71,20 +68,52 @@ NetFlow::Packet - Perl extension for a Netflow version 5 packet
 
   # create object
   my $packet = NetFlow::Packet->new(
-               version           => $version,
                count             => $count,
+               engine_id         => $engine_id,
+               engine_type       => $engine_type,
+               flows             => [ NetFlow::Flow->new() ],
+               flow_sequence     => $flow_sequence,
+               sampling_interval => $sampling_interval,
+               sampling_mode     => $sampling_mode,
                sys_uptime        => $sys_uptime,
                unix_secs         => $unix_secs,
                unix_nsecs        => $unix_nsecs,
-               flow_sequence     => $flow_sequence,
-               engine_type       => $engine_type,
-               engine_id         => $engine_id,
-               sampling_mode     => $sampling_mode,
-               sampling_interval => $sampling_interval,
-               flows             => [],
+               version           => $version,
              );
-  # print version from Netflow header
+
+  # access packet header data
+  print $packet->count(), "\n";
+  print $packet->engine_id(), "\n";
+  print $packet->engine_type(), "\n";
+  print $packet->flow_sequence(), "\n";
+  print $packet->sampling_interval(), "\n";
+  print $packet->sampling_mode(), "\n";
+  print $packet->sys_uptime(), "\n";
+  print $packet->unix_secs(), "\n";
+  print $packet->unix_nsecs(), "\n";
   print $packet->version(), "\n";
+
+  # access flow data (see NetFlow::Flow)
+  for my $flow (@{$packet->flows()}) {
+      print $flow->bytes(), "\n";
+      print $flow->dstaddr(), "\n";
+      print $flow->dstas(), "\n";
+      print $flow->dstmask(), "\n";
+      print $flow->dstport(), "\n";
+      print $flow->first(), "\n";
+      print $flow->input(), "\n";
+      print $flow->last(), "\n";
+      print $flow->nexthop(), "\n";
+      print $flow->output(), "\n";
+      print $flow->packets(), "\n";
+      print $flow->protocol(), "\n";
+      print $flow->srcaddr(), "\n";
+      print $flow->srcas(), "\n";
+      print $flow->srcmask(), "\n";
+      print $flow->srcport(), "\n";
+      print $flow->tcpflags(), "\n";
+      print $flow->tos(), "\n";
+  }
 
 =head1 DESCRIPTION
 
@@ -97,58 +126,58 @@ version
 
 =head2 count
 
-TODO
+Returns the number fo flows in the packet.
 
 =head2 engine_id
 
-TODO
+Returns the slot number of the flow switching engine.
 
 =head2 engine_type
 
-TODO
+Returns the type of flow switching engine.
 
 =head2 flows
 
-TODO
+Returns an array reference of NetFlow::Flow objects.
 
 =head2 flow_sequence
 
-TODO
+Returns the sequcne counter of total flows seen.
 
 =head2 new
 
-Returns a new NetFlow::Packet object. The parameters bytes, dstaddr, dstas, dstmask, dstport,
-first, input, last, nexthop, output, packets, protocol, tcpflags, tos, srcaddr, srcas, srcmask,
-and srcport are all required.
+Returns a new NetFlow::Packet object. The parameters count, engine_id, engine_type, flows,
+flow_sequence, sampling_interval, sampling_mode, sys_uptime, unix_nsecs, unix_secs, and 
+version are all required.
 
 =head2 sampling_interval
 
-TODO
+Returns the sampling interval.
 
 =head2 sampling_mode
 
-TODO
+Returns the sampling mode.
 
 =head2 sys_uptime
 
-TODO
+Returns the number of milliseconds since the export device booted.
 
 =head2 unix_nsecs
 
-TODO
+Returns the residual nanoseconds since the Unix epoch.
 
 =head2 unix_secs
 
-TODO
+Returns in the numbers of seconds since the Unix epoch.
 
 =head2 version
 
-TOOD
+Returns the NetFlow version number.
 
 =head1 SEE ALSO
 
-Read the documentation for the Perl modules
-NetFlow::Flow, NetFlow::Parser, and Moose.
+Read the documentation for Perl modules
+NetFlow::Flow and NetFlow::Parser.
 
 =head1 BUGS
 

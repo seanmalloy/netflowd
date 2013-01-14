@@ -6,7 +6,6 @@ NetFlow Module Tasks
 * Add tests for module correctness. (Test::Distrubution, Test::Kwalitee)
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
 * Review POD documentation for NetFlow::Parser.
-* Review POD documentation for NetFlow::Packet.
 * Replace all die statements with exceptions.
 
 SPM Module Tasks
