@@ -6,7 +6,6 @@ use warnings;
 use IO::Socket;
 use English;
 use NetFlow::Parser;
-use NetFlow::Data;
 use Getopt::Long;
 use Sys::Syslog;
 
@@ -25,14 +24,14 @@ my ($MAXLEN, $data);
 # Header: 24 bytes
 # Each Flow: 48 bytes (can be 1 to 30 flows per packet)
 my $parser = NetFlow::Parser->new();
+$parser->debug(1);
 $MAXLEN = 1464;
-my @flows;
+my $packet;
 while ($sock->recv($data, $MAXLEN)) {
     my ($port, $ip) = sockaddr_in($sock->peername);
     my $client = gethostbyaddr($ip, AF_INET);
-    $parser->read_packet($data);
-    @flows = $parser->parse();
-    for my $flow (@flows) {
+    $packet = $parser->parse($data);
+    for my $flow (@{$packet->flows()}) {
         print "Bytes: ", $flow->bytes(), "\n";
     }
 }
