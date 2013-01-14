@@ -120,7 +120,7 @@ sub parse {
 # START
 # Note: According to Cisco Netflow docs the sample interval should be 14 bits. The
 # OpenBSD if_pflow.h file sets sampling mode and sampling interval to 8 bit total. Need
-# to read appropriate RFC fro find the "correct" length of the sampling interval field.
+# to read appropriate RFC to find the "correct" length of the sampling interval field.
 sub _read_header {
     my $self       = shift;
     my $raw_packet = shift;
@@ -182,20 +182,19 @@ __PACKAGE__->meta->make_immutable;
 __END__
 =head1 NAME
 
-NetFlow::Parser - Perl extension for Parsing Netflow version 5 data
+NetFlow::Parser - Perl extension for parsing Netflow version 5 binary data
 
 =head1 SYNOPSIS
 
     use NetFlow::Parser;
-    my $nf_parser = NetFlow::Parser->new();
-    $nf_parser->read_packet($packet);
-    my @flows = $nf_parser->parse();
+    my $parser = NetFlow::Parser->new();
+    my $packet = $parser->parse($binary_packet_data);
 
 =head1 DESCRIPTION
 
-Object oriented module for parsing Netflow version 5 data.
-Returns Netflow data as NetFlow::Flow objects. This module
-is meant to be used with NetFlow::Flow and NetFlow::Packet.
+Object oriented module for parsing Netflow version 5 binary
+data. Returns Netflow data as NetFlow::Packet objects. This
+module is meant to be used with NetFlow::Flow and NetFlow::Packet.
 
 =head1 METHODS
 
@@ -206,23 +205,18 @@ turn on debug. By default debug is off.
 
 =head2 new
 
-Returns a new NetFlow::Parser object.
-
-TODO: document constructor arguements. Both optional and required.
+Returns a new NetFlow::Parser object. Only accepts the optional
+debug parameter.
 
 =head2 parse
 
-Parse binary Netflow data that has already been read with the
-read_packet() method. Returns a list of NetFlow::Flow objects.
-
-=head2 read_packet
-
-Read in a binary Netflow version 5 packet.
+Parse binary Netflow version 5 data. Returns a NetFlow::Packet
+object.
 
 =head1 SEE ALSO
 
-Read the documentation for the Perl modules
-NetFlow::Flow, NetFlow::Packet, and Moose.
+Read the documentation for Perl modules
+NetFlow::Flow and NetFlow::Packet.
 
 =head1 BUGS
 
