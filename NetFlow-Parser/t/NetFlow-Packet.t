@@ -93,8 +93,49 @@ while (my $line = <DATA>) {
     dies_ok { NetFlow::Packet->new($Test_Parameters) } $Test_Description;
 }
 
-# TODO: test constructor with valid values
+# Test constructor with valid count values
+$Packet_Data = reset_data();
+for my $count (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30) {
+    $Packet_Data->{count} = $count;
+    lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with count parameter equal to $count";
+}
 
+# Test constructor with valid engine_id values
+$Packet_Data = reset_data();
+for my $engine_id (0, 1, 254, 255) {
+    $Packet_Data->{engine_id} = $engine_id;
+    lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with engine_id parameter equal to $engine_id";
+}
+
+# Test constructor with valid engine_type values
+$Packet_Data = reset_data();
+for my $engine_type (0, 1, 254, 255) {
+    $Packet_Data->{engine_type} = $engine_type;
+    lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with engine_type parameter equal to $engine_type";
+}
+
+# TODO: flow_sequence     UnsignedInt32Bit
+$Packet_Data = reset_data();
+
+# TODO: flows             ArrayRef[NetFlow::Flow]
+$Packet_Data = reset_data();
+
+# TODO: sampling_interval UnsignedInt6Bit
+$Packet_Data = reset_data();
+
+# TODO: sampling_mode     UnsignedInt2Bit
+$Packet_Data = reset_data();
+
+# TODO: sys_uptime        UnsignedInt32Bit
+$Packet_Data = reset_data();
+
+# TODO: unix_nsecs        UnsignedInt32Bit
+$Packet_Data = reset_data();
+
+# TODO: unix_secs         UnsignedInt32Bit
+$Packet_Data = reset_data();
+
+# Do not need to test version.
 done_testing();
 
 sub reset_data {
@@ -115,7 +156,6 @@ sub reset_data {
                };
     return $data;
 }
-#     flows               Array of NetFlow::Flow objects
 __DATA__
 # Consturctor dies with missing parmaters
 $Test_Parameters = { engine_id => 0, engine_type => 0, flow_sequence => 37, flows => $Flows, sampling_interval => 1, sampling_mode => 2, sys_uptime => 1000, unix_nsecs => 1, unix_secs => 1357183150, version => 5 };|NetFlow::Packet->new() dies missing count parameter
