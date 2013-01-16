@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-# TODO: set number of tests
-use Test::More;
+use Test::More tests => 151;
 use Test::Exception;
 use Test::MockObject;
 use NetFlow::Flow;
@@ -95,7 +94,7 @@ while (my $line = <DATA>) {
 
 # Test constructor with valid count values
 $Packet_Data = reset_data();
-for my $count (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30) {
+for my $count (0..30) {
     $Packet_Data->{count} = $count;
     lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with count parameter equal to $count";
 }
@@ -114,29 +113,57 @@ for my $engine_type (0, 1, 254, 255) {
     lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with engine_type parameter equal to $engine_type";
 }
 
-# TODO: flow_sequence     UnsignedInt32Bit
+# Test constructor with valid flow_sequence values
 $Packet_Data = reset_data();
+for my $flow_sequence (0, 1, 4294967294, 4294967295) {
+    $Packet_Data->{flow_sequence} = $flow_sequence;
+    lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with flow_sequnce parameter equal to $flow_sequence";
+}
 
-# TODO: flows             ArrayRef[NetFlow::Flow]
+# Test consturctor with valid flows values
 $Packet_Data = reset_data();
+my @Valid_Flows = ( [], [ ($Mock_Flow, $Mock_Flow) ], [ ($Mock_Flow, $Mock_Flow, $Mock_Flow) ] );
+for my $flows (@Valid_Flows) {
+    $Packet_Data->{flows} = $flows;
+    lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with with flows parameter values";
+}
 
-# TODO: sampling_interval UnsignedInt6Bit
+# Test constructor with valid sampling_interval values
 $Packet_Data = reset_data();
+for my $sampling_interval (0, 1, 62, 63) {
+    $Packet_Data->{sampling_interval} = $sampling_interval;
+    lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with sampling_interval parameter equal to $sampling_interval";
+}
 
-# TODO: sampling_mode     UnsignedInt2Bit
+# Test constructor with valid sampling_mode values
 $Packet_Data = reset_data();
+for my $sampling_mode (0, 1, 2, 3) {
+    $Packet_Data->{sampling_mode} = $sampling_mode;
+    lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with sampling_mode parameter equal to $sampling_mode";
+}
 
-# TODO: sys_uptime        UnsignedInt32Bit
+# Test construcotr with valid sys_uptime values
 $Packet_Data = reset_data();
+for my $sys_uptime (0, 1, 4294967294, 4294967295) {
+    $Packet_Data->{sys_uptime} = $sys_uptime;
+    lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with sys_uptime parameter equal to $sys_uptime";
+}
 
-# TODO: unix_nsecs        UnsignedInt32Bit
+# Test constructor with valid unix_nsecs values
 $Packet_Data = reset_data();
+for my $unix_nsecs (0, 1, 4294967294, 4294967295) {
+    $Packet_Data->{unix_nsecs} = $unix_nsecs;
+    lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with unix_nsecs parameter equal to $unix_nsecs";
+}
 
-# TODO: unix_secs         UnsignedInt32Bit
+# Test constructor with valid unix_secs values
 $Packet_Data = reset_data();
+for my $unix_secs (0, 1, 4294967294, 4294967295) {
+    $Packet_Data->{unix_secs} = $unix_secs;
+    lives_ok { NetFlow::Packet->new($Packet_Data) } "NetFlow::Packet->new lives with unix_secs parameter equal to $unix_secs";
+}
 
-# Do not need to test version.
-done_testing();
+# Do not need to test construcor with valid version values. Only valid version is 5.
 
 sub reset_data {
     my $mock_flow_obj = Test::MockObject->new();

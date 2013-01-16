@@ -1,7 +1,7 @@
 NetFlow Module Tasks
 --------------------
+* Review tests for NetFlow::Flow.
 * Finish tests for NetFlow::Parser.
-* Added last tests for NetFlow::Packet::new.
 * What does the the ignore.txt file do with ExtUtils::MakeMaker?
 * Add tests for module correctness. (Test::Distrubution, Test::Kwalitee)
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
