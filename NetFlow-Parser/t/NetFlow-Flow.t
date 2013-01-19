@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-#use Test::More tests => 1480;
-use Test::More;
+use Test::More tests => 1498;
 use Test::Exception;
 BEGIN { use_ok('NetFlow::Flow') };
 
@@ -110,200 +109,132 @@ while (my $line = <DATA>) {
     dies_ok { NetFlow::Flow->new($Test_Parameters) } $Test_Description;
 }
 
-# START
-#$Flow_Data->{srcport} = -1;
-#dies_ok { $Module->new( $Flow_Data ) } 'constructor dies -1 srcport';
-#$Flow_Data->{srcport} = 65536;
-#dies_ok { $Module->new( $Flow_Data ) } 'constructor dies 65536 srcport';
-#$Flow_Data->{srcport} = 'a';
-#dies_ok { $Module->new( $Flow_Data ) } 'constructor dies \'a\' srcport';
-
-#my @tcpflags_dies_data = qw( -1 256 a 1.1 );
-#for my $number (@tcpflags_dies_data) {
-#    $Flow_Data->{tcpflags} = $number;
-#    dies_ok { $Module->new( $Flow_Data ) } "constructor dies $number tcpflags";
-#}
-
-#my @tos_dies_data = qw( -1 256 a 1.1 );
-#for my $number (@tos_dies_data) {
-#    $Flow_Data->{tos} = $number;
-#    dies_ok { $Module->new( $Flow_Data ) } "constructor dies $number tos";
-#}
-
-#my @srcas_dies_data = qw( -1 65536 a 1.1 );
-#for my $number (@srcas_dies_data) {
-#    $Flow_Data->{srcas} = $number;
-#    dies_ok { $Module->new( $Flow_Data ) } "constructor dies $number srcas";
-#}
-
-#my @dstas_dies_data = qw( -1 65536 a 1.1 );
-#for my $number (@dstas_dies_data) {
-#    $Flow_Data->{dstas} = $number;
-#    dies_ok { $Module->new( $Flow_Data ) } "constructor dies $number dstas";
-#}
-
-#my @srcmask_dies_data = qw(-1 a 256 1.1);
-#for my $number (@srcmask_dies_data) {
-#    $Flow_Data->{srcmask} = $number;
-#    dies_ok { $Module->new( $Flow_Data) } "constructor dies $number srcmask";
-#}
-
-#my @dstmask_dies_data = qw ( -1 a 256 1.1);
-#for my $number (@dstmask_dies_data) {
-#    $Flow_Data->{dstmask} = $number;
-#    dies_ok { $Module->new( $Flow_Data ) } "constructor dies $number dstmask";
-#}
-
-#my @input_dies_data = qw( a 1.1 -1 65536 );
-#for my $number (@input_dies_data) {
-#    $Flow_Data->{input} = $number;
-#    dies_ok { $Module->new( $Flow_Data ) } "constructor dies $number input";
-#}
-
-#my @output_dies_data = qw( a 1.1 -1 65536 );
-#for my $number (@output_dies_data) {
-#    $Flow_Data->{output} = $number;
-#    dies_ok { $Module->new( $Flow_Data ) } "constructor dies $number output";
-#}
-
-# Test bytes.
-$Flow_Data->{bytes} = 0;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives zero bytes';
-$Flow_Data->{bytes} = 1;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives one byte';
-$Flow_Data->{bytes} = 4294967295;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives 4294967295 bytes';
+# Test constructor with valid bytes values
 $Flow_Data = reset_data();
-
-# Test dstport
-$Flow_Data->{dstport} = 0;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives 0 dstport';
-$Flow_Data->{dstport} = 1;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives 1 dstport';
-$Flow_Data->{dstport} = 80;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives 80 dstport';
-$Flow_Data->{dstport} = 65535;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives 65535 dstport';
-
-# Test first
-$Flow_Data = reset_data();
-my @lives_data = qw( 0 1 4294967295);
-for my $item (@lives_data) {
-    $Flow_Data->{first} = $item;
-    lives_ok { $Module->new( $Flow_Data ) } "constructor lives $item first";
+for my $bytes (0, 1, 4294967295) {
+    $Flow_Data->{bytes} = $bytes;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with bytes parameter equal to $bytes";
 }
 
-# Test last
+# Test constructor with valid dstport values
 $Flow_Data = reset_data();
-for my $item (@lives_data) {
-    $Flow_Data->{last} = $item;
-    lives_ok { $Module->new( $Flow_Data ) } "constructor lives $item last";
+for my $dstport (0, 1, 80, 65535) {
+    $Flow_Data->{dstport} = $dstport;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with dstport parameter equal to $dstport";
 }
 
-# Test packets
+# Test constructor with valid first values
 $Flow_Data = reset_data();
-for my $item (@lives_data) {
-    $Flow_Data->{packets} = $item;
-    lives_ok { $Module->new( $Flow_Data ) } "constructor lives $item packets";
+for my $first (0, 1, 4294967295) {
+    $Flow_Data->{first} = $first;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with first parameter equal to $first";
 }
 
-# Test protocol
+# Test constructor with valid last values
 $Flow_Data = reset_data();
-my @protocol_lives_data = 0..255;
-for my $item (@protocol_lives_data) {
-    $Flow_Data->{protocol} = $item;
-    lives_ok { $Module->new( $Flow_Data ) } "constructor lives $item protocol";
+for my $last (0, 1, 4294967295) {
+    $Flow_Data->{last} = $last;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with last parameter equal to $last";
 }
 
-# Test srcaddr, dstaddr, nexthop
+# Test constructor with valid packets values
 $Flow_Data = reset_data();
-my @valid_ip_addresses = qw( 0.0.0.0 255.255.255.255 );
-for my $address (@valid_ip_addresses) {
-    $Flow_Data->{dstaddr} = $address;
-    lives_ok { $Module->new( $Flow_Data ) } "consturctor lives dstaddr $address";
-    $Flow_Data = reset_data();
-    $Flow_Data->{srcaddr} = $address;
-    lives_ok { $Module->new( $Flow_Data ) } "consturctor lives srcaddr $address";
-    $Flow_Data = reset_data();
-    $Flow_Data->{nexthop} = $address;
-    lives_ok { $Module->new( $Flow_Data ) } "consturctor lives nexthop $address";
-    $Flow_Data = reset_data();
+for my $packets (0, 1, 4294967295) {
+    $Flow_Data->{packets} = $packets;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with packets parameter equal to $packets";
 }
 
-# Test srcport
-$Flow_Data->{srcport} = 0;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives 0 srcport';
-$Flow_Data->{srcport} = 1;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives 1 srcport';
-$Flow_Data->{srcport} = 80;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives 80 srcport';
-$Flow_Data->{srcport} = 65535;
-lives_ok { $Module->new( $Flow_Data ) } 'constructor lives 65536 srcport';
-
-# Test tcpflags
+# Test constructor with valid protocol values
 $Flow_Data = reset_data();
-my @tcpflags_lives_data =  ( 0..255 );
-for my $number (@tcpflags_lives_data) {
-    $Flow_Data->{tcpflags} = $number;
-    lives_ok { $Module->new( $Flow_Data ) } "consturctor lives $number tcpflags";
+for my $protocol (0..255) {
+    $Flow_Data->{protocol} = $protocol;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with protocol parameter equal to $protocol";
 }
 
-# Test tos
+# Test constructor with valid dstaddr values
 $Flow_Data = reset_data();
-my @tos_lives_data =  ( 0..255 );
-for my $number (@tos_lives_data) {
-    $Flow_Data->{tos} = $number;
-    lives_ok { $Module->new( $Flow_Data ) } "consturctor lives $number tos";
+for my $dstaddr ('0.0.0.0', '255.255.255.255' ) {
+    $Flow_Data->{dstaddr} = $dstaddr;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with dstaddr equal to $dstaddr";
 }
 
-# Test srcas
+# Test constructor with valid srcaddr values
 $Flow_Data = reset_data();
-my @srcas_lives_data = qw( 0 1 65535 );
-for my $number (@srcas_lives_data) {
-    $Flow_Data->{srcas} = $number;
-    lives_ok { $Module->new( $Flow_Data ) } "constructor lives $number srcas";
+for my $srcaddr ('0.0.0.0', '255.255.255.255' ) {
+    $Flow_Data->{srcaddr} = $srcaddr;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with srcaddr equal to $srcaddr";
 }
 
-# Test dstas
+# Test constructor with valid nexthop values
+$Flow_Data = reset_data();
+for my $nexthop ('0.0.0.0', '255.255.255.255' ) {
+    $Flow_Data->{nexthop} = $nexthop;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with nexthop equal to $nexthop";
+}
+
+# Test constructor with valid srcport values
+$Flow_Data = reset_data();
+for my $srcport (0, 1, 80, 65535) {
+    $Flow_Data->{srcport} = $srcport;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with srcport equal to $srcport";
+}
+
+# Test constructor with valid tcpflags values
+$Flow_Data = reset_data();
+for my $tcpflags (0..255) {
+    $Flow_Data->{tcpflags} = $tcpflags;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with tcpflows equal to $tcpflags";
+}
+
+# Test constructor with valid tos values
+$Flow_Data = reset_data();
+for my $tos (0..255) {
+    $Flow_Data->{tos} = $tos;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with tos equal to $tos";
+}
+
+# Test constructor with valid srcas values
+$Flow_Data = reset_data();
+for my $srcas (0, 1, 65535) {
+    $Flow_Data->{srcas} = $srcas;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with srcas equal to $srcas";
+}
+
+# Test constructor with valid dstas values
 $Flow_Data = reset_data();
 my @dstas_lives_data = qw( 0 1 65535 );
-for my $number (@dstas_lives_data) {
-    $Flow_Data->{dstas} = $number;
-    lives_ok { $Module->new( $Flow_Data ) } "constructor lives $number dstas";
+for my $dstas (0, 1, 65535) {
+    $Flow_Data->{dstas} = $dstas;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with dstas equal to $dstas";
 }
 
-# Test srcmask
+# Test constructor with valid srcmask values
 $Flow_Data = reset_data();
-for my $number (0..255) {
-    $Flow_Data->{srcmask} = $number;
-    lives_ok { $Module->new( $Flow_Data ) } "consturctor lives $number srcmask";
+for my $srcmask (0..255) {
+    $Flow_Data->{srcmask} = $srcmask;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with srcmask equal to $srcmask";
 }
 
-# Test dstmask
+# Test constructor with valid dstmask values
 $Flow_Data = reset_data();
-for my $number (0..255) {
-    $Flow_Data->{dstmask} = $number;
-    lives_ok { $Module->new ( $Flow_Data ) } "constructor lives $number dstmask";
+for my $dstmask (0..255) {
+    $Flow_Data->{dstmask} = $dstmask;
+    lives_ok { $Module->new ( $Flow_Data ) } "NetFlow::Flow->new lives with dstmaks equal to $dstmask";
 }
 
-# Test input
+# Test constructor with valid input values
 $Flow_Data = reset_data();
-my @input_lives_data = qw( 0 1 65535);
-for my $number (@input_lives_data) {
-    $Flow_Data->{input} = $number;
-    lives_ok { $Module->new( $Flow_Data ) } "constructor lives $number input";
+for my $input (0, 1, 65535) {
+    $Flow_Data->{input} = $input;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with input equal to $input";
 }
 
-# Test output
+# Test constructor with valid output values
 $Flow_Data = reset_data();
-my @output_lives_data = qw( 0 1 65535);
-for my $number (@output_lives_data) {
-    $Flow_Data->{output} = $number;
-    lives_ok { $Module->new( $Flow_Data ) } "constructor lives $number output";
+for my $output (0, 1, 65535) {
+    $Flow_Data->{output} = $output;
+    lives_ok { $Module->new( $Flow_Data ) } "NetFlow::Flow->new lives with output equal to $output";
 }
-$Flow_Data = reset_data();
-
-done_testing();
 
 sub reset_data {
     my $reset_data = { bytes    => 5,
@@ -398,3 +329,38 @@ $Test_Parameters = { bytes => 5, dstaddr => '1.1.1.', dstas => 1, dstmask => 1, 
 $Test_Parameters = { bytes => 5, dstaddr => '256.256.256.256', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 256.256.256.256 dstaddr parameter
 $Test_Parameters = { bytes => 5, dstaddr => '-1.-1.-1.-1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with -1.-1.-1.-1 dstaddr parameter
 $Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1111', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 192.168.1.1111 dstaddr parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 'a',   srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with non-numberic srcport parameter 
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => -1,    srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with negative srcport parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 65536, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 65536 srcport parameter 
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => -1,  tos => 1, };|NetFlow::Flow->new() dies with negative tcpflags parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1.1, tos => 1, };|NetFlow::Flow->new() dies with 1.1 tcpflags parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 'a', tos => 1, };|NetFlow::Flow->new() dies with non-numeric tcpflags parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 256, tos => 1, };|NetFlow::Flow->new() dies with 256 tcpflags parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => -1, };|NetFlow::Flow->new() dies with negative tos parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1.1, };|NetFlow::Flow->new() dies with 1.1 tos parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 'a', };|NetFlow::Flow->new() dies with non-numeric tos parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 256, };|NetFlow::Flow->new() dies with 256 tos parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => -1,    tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with negative srcas parmater
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1.1,   tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 1.1 srcas parmater
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 'a',   tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with non-numeric srcas parmater
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 65536, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 65536 srcas parmater
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => -1,    dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with negative dstas parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1.1,   dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 1.1 dstas parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 'a',   dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with non-numberic dstas parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 65536, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 65536 dstas parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => -1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with negative srcmask parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1.1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 1.1 srcmask parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 'a', srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with non-numeric srcmask parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 256, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 256 srcmask parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => -1,  dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with negative dstmask parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 'a', dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with non-numeric dstmask parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1.1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 1.1 dstmask parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 256, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 256 dstmask parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 'a',   last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with non-numeric input parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1.1,   last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 1.1 input parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => -1,    last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with negative input parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 65536, last => 1, nexthop => '192.168.1.1', output => 1, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 65536 input parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 'a',   packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with non-numeric output parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 1.1,   packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 1.1 output parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => -1,    packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with negative output parameter
+$Test_Parameters = { bytes => 5, dstaddr => '192.168.1.1', dstas => 1, dstmask => 1, dstport => 80, first => 1, input => 1, last => 1, nexthop => '192.168.1.1', output => 65536, packets => 1, protocol => 1, srcaddr => '192.168.1.2', srcmask => 1, srcport => 1099, srcas => 1, tcpflags => 1, tos => 1, };|NetFlow::Flow->new() dies with 65536 output parameter
