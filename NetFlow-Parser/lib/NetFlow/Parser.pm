@@ -7,12 +7,15 @@ use NetFlow::Packet;
 use NetFlow::Flow;
 our $VERSION = '0.01';
 
-has 'debug' => (isa => 'Int', is => 'rw', required => 0); # Set to non-zero to enable debugging
+has 'debug' => (isa => 'Int', is => 'rw', required => 0, default => 0); # Set to non-zero to enable debugging
 
 # returns: NetFlow::Packet object.
 sub parse {
     my $self   = shift;
     my $packet = shift;
+    if (!defined $packet) {
+        die "ERROR: missing binary packet parameter"; #TODO: replace with exception
+    }
     my %header = $self->_read_header($packet);
     if ($self->debug()) {
         warn "##### Start Parse #####";
