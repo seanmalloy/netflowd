@@ -40,21 +40,25 @@ dies_ok { NetFlow::Parser->parse({})  } "NetFlow::Parser->parse dies, hash refer
 
 # TODO: Test parse method with binary data
 my ($Packet_Data, $Test_Type, $Test_Description);
+my $Csv_Parser = Text::CSV->new( { binary => 1 } );   # TODO: handle error if constructor fails
 LINE:
 while (my $line = <DATA>) {
     chomp $line;
     if ($line =~ /^#/) {
         next LINE;
     }
-    ($Packet_Data, $Test_Type, $Test_Description) = split /\|/, $line; 
+    $Csv_Parser->parse($line);    # TODO: handle parse method failure
+    ($Packet_Data, $Test_Type, $Test_Description) = $Csv_Parser->fields();
+    #diag("Packet_Data = $Packet_Data");
     # TODO: run pack() on $Packet_Data  (what if pack() fails?)
     if ($Test_Type eq 'DIES') {
         dies_ok { $Parser->parse($Packet_Data) } $Test_Description;
     } elsif ($Test_Type eq 'LIVES') {
         lives_ok { $Parser->parse($Packet_Data) } $Test_Description;
-        # TODO: test that parse method returns a NetFlow::Packet object
+        isa_ok($Parser->parse($Packet_Data), 'NetFlow::Packet');
     } else {
-        # TODO: what to do if we get invalid data for test type?
+        diag("Invalid test type '$Test_Type'");
+        fail($Test_Description);
     }
 }
 done_testing();
@@ -63,3 +67,4 @@ __DATA__
 #DATA,TYPE,DESCRIPTION
 #XXXX,LIVES,LIVES OK
 #ZZZZ,DIES,DIES OK
+#XXXX,DIES,Test Test Test
