@@ -120,7 +120,6 @@ sub parse {
     );
 }
 
-# START
 # Note: According to Cisco Netflow docs the sample interval should be 14 bits. The
 # OpenBSD if_pflow.h file sets sampling mode and sampling interval to 8 bit total. Need
 # to read appropriate RFC to find the "correct" length of the sampling interval field.
@@ -148,17 +147,17 @@ sub _read_header {
         warn "##### End Parse Header #####";
     }
 
+    # Only support Netflow version 5
+    if ($version != 5) {
+        die "Unknown Netflow version: $version. only supports Netflow version 5"; # TODO: throw different exception
+    }
+
     # Validate length of all flow records. Each flow
     # record should be 384 bits.
     if ( length $flow_data != (384 * $count) ) {
         die "parse error: invalid flow record length";  # TODO: throw different exception 
     }
-
-    # Only support Netflow version 5
-    if ($version != 5) {
-        die "Unknown Netflow version: $version. only supports Netflow version 5"; # TODO: throw different exception
-    }
-    
+        
     $engine_type       = bin2dec($engine_type);
     $engine_id         = bin2dec($engine_id);
     $sampling_mode     = bin2dec($sampling_mode);
