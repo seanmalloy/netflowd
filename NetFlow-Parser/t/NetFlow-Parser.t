@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use English qw(-no_match_vars) ;
-use Test::More tests => 26;
+use Test::More tests => 28;
 use Test::Exception;
 BEGIN { use_ok('NetFlow::Parser') };
 
