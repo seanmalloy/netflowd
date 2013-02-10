@@ -3,7 +3,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME                => 'SPM::Util',
+    NAME                => 'SPM::Util::Num',
     AUTHOR              => q{Sean Malloy <spinelli85@gmail.com>},
     VERSION_FROM        => 'lib/SPM/Util/Num.pm',
     ABSTRACT_FROM       => 'lib/SPM/Util/Num.pm',

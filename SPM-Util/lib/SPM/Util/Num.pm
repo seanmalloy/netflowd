@@ -3,7 +3,7 @@ package SPM::Util::Num;
 use 5.010001;
 use strict;
 use warnings;
-use SPM::Exception;
+use SPM::X::BadValue;
 require Exporter;
 
 our @ISA = qw(Exporter);
@@ -18,7 +18,14 @@ sub bin2dec {
     
     # Only binary number are valid input.
     if ($num !~ /^[0-1]+$/) {
-        SPM::Exception::OutOfRange->throw;
+        SPM::X::BadValue->throw({
+            ident   => 'bad binary number',
+            tags    => [ qw(number) ],
+            public  => 1,
+            message => "invalid number %{given_value}s for %{given_for}s",
+            given_value => $num,
+            given_for   => 'binary to decimal conversion',
+        });
     }
     
     # Strip leading zeroes.
@@ -35,11 +42,26 @@ sub bin2dottedquad {
 
     # Only binary number are valid input.
     if ($ipv4 !~ /^[0-1]+$/) {
-        SPM::Exception::OutOfRange->throw;
+        SPM::X::BadValue->throw({
+            ident   => 'bad binary number',
+            tags    => [ qw(number) ],
+            public  => 1,
+            message => "invalid number %{given_value}s for %{given_for}s",
+            given_value => $ipv4,
+            given_for   => 'binary to ip address conversion',
+        });
     }
 
     if (length($ipv4) != 32) {
-        SPM::Exception::OutOfRange->throw;
+        SPM::X::BadValue->throw({
+            ident   => 'bad binary number',
+            tags    => [ qw(number) ],
+            public  => 1,
+            message => "binary number %{given_value}s for %{given_for}s is not 32 bits",
+            given_value => $ipv4,
+            given_for   => 'binary to ip address conversion',
+        });
+
     }
     my ($part1, $part2, $part3, $part4) = unpack "A8A8A8A8", $ipv4;
     return(bin2dec($part1) . '.' . bin2dec($part2) . '.' . bin2dec($part3) .
@@ -54,7 +76,15 @@ sub dec2bin {
 
     # Only numbers are valid input.
     if ($num !~ /^\d+$/) {
-        SPM::Exception::OutOfRange->throw;
+        SPM::X::BadValue->throw({
+            ident   => 'bad number',
+            tags    => [ qw(number) ],
+            public  => 1,
+            message => "invalid number %{given_value}s for %{given_for}s",
+            given_value => $num,
+            given_for   => 'decimal to binary conversion',
+        });
+
     }
     return(sprintf("%b", $num));
 }
@@ -62,7 +92,15 @@ sub dec2bin {
 sub _check_reference {
     my $parameter = shift;
     if (ref($parameter) ne '') {
-        SPM::Exception::InvalidInputReference->throw;
+        SPM::X::BadValue->throw({
+            ident   => 'bad parameter',
+            tags    => [ qw(reference) ],
+            public  => 1,
+            message => "invalid parameter %{given_value}s for %{given_for}s",
+            given_value => ref($parameter) . ' reference',
+            given_for   => 'reference test',
+        });
+
     }
     return $parameter;
 }
@@ -70,22 +108,29 @@ sub _check_reference {
 sub _check_undef {
     my $parameter = shift;
     if (!defined $parameter) {
-        SPM::Exception::InvalidInputUndef->throw;
+        SPM::X::BadValue->throw({
+            ident   => 'bad parameter',
+            tags    => [ qw(undef) ],
+            public  => 1,
+            message => "invalid parameter %{given_value}s for %{given_for}s",
+            given_value => 'undef',
+            given_for   => 'undef test',
+        });
     }
     return $parameter;
 }
 
-1;
-__END__
 # TODO: document the fact that input with leading zeroes must be a string, not a number.
+1;
 
+__END__
 =head1 NAME
 
 SPM::Util::Num - Perl number utility
 
 =head1 SYNOPSIS
 
-  use SPM::Util::Num qw( bic2dec );
+  use SPM::Util::Num qw( bin2dec bin2dottedquad dec2bin);
 
 =head1 DESCRIPTION
 
@@ -95,6 +140,20 @@ The SPM::Util::Num modules contains various function to manipulate number.
 
 Nothing is exported by default from this module. All functions need to
 be explicitly requested.
+
+=head1 FUNCTIONS
+
+=head2 bin2dec
+
+Convert a binary number to decimal.
+
+=head2 bin2dottedquad
+
+Convert a binary number to a IPv4 dotted quad notation.
+
+=head2 dec2bin
+
+Convert a decimal number to binary
 
 =head1 SEE ALSO
 

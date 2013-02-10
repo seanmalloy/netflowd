@@ -3,10 +3,10 @@ MANIFEST
 Makefile.PL
 README
 lib/SPM/Util/Num.pm
-lib/SPM/Exception.pm
+lib/SPM/X/BadValue.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-t/SPM-Exception.t
 t/SPM-Util-Num.t
+t/SPM-X-BadValue.t
 

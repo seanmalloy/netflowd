@@ -3,15 +3,14 @@ NetFlow Module Tasks
 * What does the the ignore.txt file do with ExtUtils::MakeMaker?
 * Add tests for module correctness. (Test::Distrubution, Test::Kwalitee)
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
-* Replace all die statements with Moose Throwable classes.
+* Replace all die statements with Moose Throwable::X classes.
 * Add exception handling using Try::Tiny.
 
 SPM Module Tasks
 ----------------
 * Add tests for module correctness. (Test::Distrubution, Test::Kwalitee, Test::CheckManifest)
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
-* Rewrite SPM::Exception with Moose Throwable.
-* Write all documentation for SPM::Util::Num and SPM::Exception.
+* Update all documentation.
 
 Database Tasks
 --------------
