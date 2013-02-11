@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use English qw(-no_match_vars) ;
-use Test::More tests => 28;
+use Test::More tests => 31;
 use Test::Exception;
 BEGIN { use_ok('NetFlow::Parser') };
 
@@ -37,6 +37,9 @@ dies_ok { NetFlow::Parser->parse(1)   } "NetFlow::Parser->parse dies, integer pa
 dies_ok { NetFlow::Parser->parse(1.1) } "NetFlow::Parser->parse dies, float parameter";
 dies_ok { NetFlow::Parser->parse([])  } "NetFlow::Parser->parse dies, array reference parameter";
 dies_ok { NetFlow::Parser->parse({})  } "NetFlow::Parser->parse dies, hash reference parameter";
+
+# Test exception thrown by parse method
+throws_ok { NetFlow::Parser->parse() } 'SPM::X::BadValue', "NetFlow::Parser->parse throws SPM::X::BadValue when missing parameter";
 
 # Test parse method with binary data
 SKIP: {
@@ -74,6 +77,12 @@ SKIP: {
         }
     }
 }
+my $Packet_Data = pack('H*', "00020001cba6a0d851074503145d3578001944872a2a0000c0a80171c0a8010100000000000000000000000100000040cba5d1d0cba5e94083f00035000011000000000000000000");
+throws_ok { $Parser->parse($Packet_Data) } 'SPM::X::BadValue', 'NetFlow::Parser->parse throws SPM::X::BadValue with invalid Netflow version';
+
+
+$Packet_Data = pack('H*', "00050001cba6a0d851074503145d3578001944872a2a0000c0a80171c0a80000000000000000000000");
+throws_ok { $Parser->parse($Packet_Data) } 'SPM::X::BadValue', 'NetFlow::Parser->parse throws SPM::X::BadValue with invalid flow lenght';
 
 __DATA__
 #HEX_DATA,TYPE,DESCRIPTION

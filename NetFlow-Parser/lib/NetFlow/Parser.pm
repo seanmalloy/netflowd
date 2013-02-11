@@ -14,7 +14,14 @@ sub parse {
     my $self   = shift;
     my $packet = shift;
     if (!defined $packet) {
-        die "ERROR: missing binary packet parameter"; #TODO: replace with exception
+        SPM::X::BadValue->throw({
+            ident   => 'bad value',
+            tags    => [ qw(value) ],
+            public  => 1,
+            message => "invalid value %{given_value}s for %{given_for}s",
+            given_value => 'undef',
+            given_for   => 'netflow packet data',
+        });
     }
     my %header = $self->_read_header($packet);
     if ($self->debug()) {
@@ -129,7 +136,7 @@ sub _read_header {
     my ($version,       $count,             $sys_uptime,  $unix_secs,
         $unix_nsecs,    $flow_sequence,     $engine_type, $engine_id,
         $sampling_mode, $sampling_interval, $flow_data) =
-            unpack('n1n1N1N1N1N1B8B8B2B6B*', $raw_packet); # TODO - does this work on little and big endian?
+            unpack('n1n1N1N1N1N1B8B8B2B6B*', $raw_packet);
 
     if ($self->debug()) {
         warn "##### Start Parse Header #####";
@@ -149,13 +156,27 @@ sub _read_header {
 
     # Only support Netflow version 5
     if ($version != 5) {
-        die "Unknown Netflow version: $version. only supports Netflow version 5"; # TODO: throw different exception
+        SPM::X::BadValue->throw({
+            ident   => 'bad value',
+            tags    => [ qw(number) ],
+            public  => 1,
+            message => "invalid number %{given_value}s for %{given_for}s",
+            given_value => $version,
+            given_for   => 'netflow version',
+        });
     }
 
     # Validate length of all flow records. Each flow
     # record should be 384 bits.
     if ( length $flow_data != (384 * $count) ) {
-        die "parse error: invalid flow record length";  # TODO: throw different exception 
+        SPM::X::BadValue->throw({
+            ident   => 'bad value',
+            tags    => [ qw(value) ],
+            public  => 1,
+            message => "invalid value %{given_value}s for %{given_for}s",
+            given_value => length($flow_data),
+            given_for   => 'netflow flow length',
+        });
     }
         
     $engine_type       = bin2dec($engine_type);
