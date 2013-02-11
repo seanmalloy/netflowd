@@ -1,9 +1,11 @@
 Changes
 MANIFEST
+MANIFEST.SKIP
 Makefile.PL
 README
 lib/SPM/Util/Num.pm
 lib/SPM/X/BadValue.pm
+t/distribution.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

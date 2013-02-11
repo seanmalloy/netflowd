@@ -4,6 +4,8 @@ use Moose;
 with qw(Throwable::X);
  
 use Throwable::X -all; # to get the Payload helper
+
+our $VERSION = 0.01;
  
 sub x_tags { qw(value) }
  
@@ -42,7 +44,6 @@ SPM::X::BadValue - Perl extension for thowing a BadValue Exception
     given_for   => 'filename',
   });
 
-
 =head1 DESCRIPTION
 
 Thow a BadValue exception.
@@ -52,6 +53,10 @@ Thow a BadValue exception.
 =head2 throw
 
 Throws an exception.
+
+=head2 x_tags
+
+List of tags this modules has.
 
 =head1 SEE ALSO
 

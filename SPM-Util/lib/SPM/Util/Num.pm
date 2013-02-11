@@ -120,7 +120,6 @@ sub _check_undef {
     return $parameter;
 }
 
-# TODO: document the fact that input with leading zeroes must be a string, not a number.
 1;
 
 __END__
@@ -130,11 +129,11 @@ SPM::Util::Num - Perl number utility
 
 =head1 SYNOPSIS
 
-  use SPM::Util::Num qw( bin2dec bin2dottedquad dec2bin);
+  use SPM::Util::Num qw( bin2dec bin2dottedquad dec2bin );
 
 =head1 DESCRIPTION
 
-The SPM::Util::Num modules contains various function to manipulate number.
+The SPM::Util::Num modules contains functions to manipulate numbers.
 
 =head2 EXPORT
 
@@ -149,7 +148,7 @@ Convert a binary number to decimal.
 
 =head2 bin2dottedquad
 
-Convert a binary number to a IPv4 dotted quad notation.
+Convert a 32-bit binary number to IPv4 dotted quad notation(i.e. 192.168.1.1).
 
 =head2 dec2bin
 
@@ -157,10 +156,12 @@ Convert a decimal number to binary
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
+None.
+
+=head1 BUGS
+
+The parameter to the bin2dec and bin2dottedquad functions
+must be a string if it has leading zeroes.
 
 =head1 AUTHOR
 
@@ -175,3 +176,4 @@ it under the same terms as Perl itself, either Perl version 5.10.1 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
+
