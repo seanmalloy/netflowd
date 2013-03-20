@@ -9,9 +9,15 @@ SPM Module Tasks
 ----------------
 * Add Test::Kwalitee tests.
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
+* Finish SPM::Daemon.   #### START
+* Test SPM::Daemon.
 
 Database Tasks
 --------------
 * Fix unix_seconds in the headers_localtime view.
 * Create database tests.
+
+Main Daemon Tasks
+-----------------
+* Re-write to use SPM::Daemon.
 
