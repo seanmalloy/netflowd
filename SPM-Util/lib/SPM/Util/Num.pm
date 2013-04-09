@@ -133,7 +133,7 @@ SPM::Util::Num - Perl number utility
 
 =head1 DESCRIPTION
 
-The SPM::Util::Num modules contains functions to manipulate numbers.
+The SPM::Util::Num module contains functions to manipulate numbers.
 
 =head2 EXPORT
 
