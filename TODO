@@ -9,8 +9,8 @@ SPM Module Tasks
 ----------------
 * Add Test::Kwalitee tests.
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
-* Finish SPM::Daemon.   #### START
-* Test SPM::Daemon.
+* Make SPM::Daemon use exceptions instead of Carp module.
+* Write tests for SPM::Daemon.
 
 Database Tasks
 --------------
@@ -19,5 +19,12 @@ Database Tasks
 
 Main Daemon Tasks
 -----------------
-* Re-write to use SPM::Daemon.
-
+* Read Chapters 18 and 19 of "Perl Network Programming".
+  * Start with chap 18 section "Increasing Robustness of UDP Applications"
+* Create config file
+  * User to run as
+  * Group to run as
+  * PID file path
+  * Database name
+  * UDP Port
+  * IP address to listen on
