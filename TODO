@@ -19,8 +19,8 @@ Database Tasks
 
 Main Daemon Tasks
 -----------------
-* Read Chapters 18 and 19 of "Perl Network Programming".
-  * Start with chap 18 section "Increasing Robustness of UDP Applications"
+* Clean up any "todo" items.
+* Clean up database creation code.
 * Create config file
   * User to run as
   * Group to run as
