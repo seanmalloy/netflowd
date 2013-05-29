@@ -11,7 +11,6 @@ SPM Module Tasks
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
 * Make SPM::Daemon use exceptions instead of Carp module.
 * Write tests for SPM::Daemon.
-* Add Test::Perl::Critic tests.
 
 Database Tasks
 --------------

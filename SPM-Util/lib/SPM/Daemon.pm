@@ -23,8 +23,8 @@ sub _become_daemon {
     die "Can't fork" unless defined (my $child = fork);
     exit 0 if $child;  # parent dies
     setsid();          # become session leader
-    open(STDIN,  "</dev/null");
-    open(STDOUT, ">/dev/null");
+    open(STDIN,  '<', '/dev/null');
+    open(STDOUT, '>', '/dev/null');
     open(STDERR, ">&STDOUT");
     chdir '/';      # change working directory
     umask(0);       # forget file mode creation mask
@@ -72,7 +72,7 @@ sub _open_pid_file {
         cluck "Removing PID file for defunct server process $Pid.\n";
         croak "Can't unlink PID file $file" unless -w $file && unlink $file;
     }
-    return IO::File->new($file, O_WRONLY|O_CREAT|O_EXCL, 0644)
+    return IO::File->new($file, O_WRONLY|O_CREAT|O_EXCL, oct(644))
         or die "Can't create $file: $OS_ERROR\n";
 }
 
