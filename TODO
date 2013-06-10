@@ -4,6 +4,7 @@ NetFlow Module Tasks
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
 * Test Netflow::Parser module on little and big
   endian architectures.
+* Convert to Dist::Zilla?
 
 SPM Module Tasks
 ----------------
@@ -11,6 +12,7 @@ SPM Module Tasks
 * Review POD Tests (Test::Pod, Test::Pod::Coverage)
 * Make SPM::Daemon use exceptions instead of Carp module.
 * Write tests for SPM::Daemon.
+* Convert to Dist::Zilla?
 
 Database Tasks
 --------------
@@ -28,4 +30,5 @@ Main Daemon Tasks
   * UDP Port
   * IP address to listen on
 * Add Test::Perl::Critic tests.
+* Convert to Dist::Zilla?
 
