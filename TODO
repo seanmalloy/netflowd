@@ -20,7 +20,6 @@ Database Tasks
 Main Daemon Tasks
 -----------------
 * Clean up any "todo" items.
-* Clean up database creation code.
 * Create config file
   * User to run as
   * Group to run as
