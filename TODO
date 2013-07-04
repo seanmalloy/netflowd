@@ -22,13 +22,9 @@ Database Tasks
 Main Daemon Tasks
 -----------------
 * Clean up any "todo" items.
-* Create config file
-  * User to run as
-  * Group to run as
-  * PID file path
-  * Database name
-  * UDP Port
-  * IP address to listen on
+* Add to command line options and config file
+  * --log-level
+  * --listen-address
 * Add Test::Perl::Critic tests.
 * Convert to Dist::Zilla?
 

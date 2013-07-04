@@ -3,30 +3,92 @@
 use strict;
 use warnings;
 use English qw( -no_match_vars );
-
 use IO::Socket;
 use NetFlow::Parser;
 use Getopt::Long;
 use SPM::Daemon qw( init_server_user log_die log_notice log_warn );
 use DBI;
+use Config::Simple;
+use Pod::Usage;
 
 # Signal Handlers
 $SIG{'INT'}  = 'exit_handler';
 $SIG{'TERM'} = 'exit_handler';
 
-# TODO: parse config file
+# TODO: Add to command line options
+# --listen-address
+# --log-level
 
-my ($Port);
+my ($Config_File, $Database_File, $Group, $Help, $Manual, $Pid_File, $Port, $User);
+if (!GetOptions('config-file=s' => \$Config_File,
+                'database=s'    => \$Database_File,
+                'group=s'       => \$Group,
+                'help'          => \$Help,
+                'manual'        => \$Manual,
+                'pid-file=s'    => \$Pid_File,
+                'port=i'        => \$Port,
+                'user=s'        => \$User, )) {
+    pod2usage(-exitval => 1,
+              -verbose => 1, 
+    );
+}
+
+if ($Help) {
+    pod2usage(-exitval => 0,
+              -verbose => 1,
+    );
+}
+
+if ($Manual) {
+    pod2usage(-exitval => 0,
+              -verbose => 2,
+    );
+}
+
+# TODO: handle this better? different error message?
+if (!defined $Config_File) {
+    my $error_message = "--config-file option missing";
+    pod2usage(-exitval => 1,
+              -msg     => $error_message,
+              -verbose => 1,
+    );
+}
+
+# Parse Config File
+# TODO: Add to config file
+# --listen-address
+# --log-level
+my $Config = new Config::Simple($Config_File);
+
+if (!defined $Database_File) {
+    $Database_File = $Config->param('database.file');
+}
+
+if (!defined $User) {
+    $User = $Config->param('general.user');
+}
+if (!defined $Group) {
+    $Group = $Config->param('general.group');
+}
+
+if (!defined $Pid_File) {
+    $Pid_File = $Config->param('general.pid-file');
+}
+
+if (!defined $Port) {
+    $Port = $Config->param('network.port');
+}
+
+# Set Defaults
 if (!defined $Port) {
     $Port = 1234;
 }
+if (!defined $Pid_File) {
+    $Pid_File = '/var/run/server.pid';
+} 
 
-my $Pid_File = '/var/run/server.pid';
+init_server_user($Pid_File, $User, $Group);
 
-init_server_user($Pid_File, 'sean', 'sean');
-
-#my $Database_File = "/home/sean/projects/Perl-NetFlow-Collector/netflow.db";
-my $Database_File   = "/home/sean/projects/Perl-NetFlow-Collector/netflow2.db";
 my $Database_Handle = create_database($Database_File);
 my $Exit = 0;
 
@@ -84,28 +146,28 @@ sub clean_up {
 sub create_database {
     my $database_file = shift;
     if (!defined $database_file) {
-        log_die("Cannot connect to undefined database");
+        log_die("cannot connect to database: missing database connection informtion");
     }
 
     if (-f $database_file) {
         my $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
         if (!defined $database_handle) {
-            log_die("Cannot connect to database $database_file: $DBI::errstr");
+            log_die("cannot connect to database $database_file: $DBI::errstr");
         }
 
         # Exit if headers table does not exist.
         if (scalar($database_handle->tables(undef, undef, 'headers', 'TABLE')) != 1) {
-            log_die("Missing table 'headers' in database $database_file");
+            log_die("missing table 'headers' in database $database_file");
         }
 
         # Exit if flows table does not exist.
         if (scalar($database_handle->tables(undef, undef, 'flows' , 'TABLE')) != 1) {
-            log_die("Missing table 'flows' in database $database_file");
+            log_die("missing table 'flows' in database $database_file");
         }
 
         # Exit if view does not exist.
         if (scalar($database_handle->tables(undef, undef, 'headers_localtime' , 'VIEW')) != 1) {
-            log_die("Missing view 'headers_localtime' in database $database_file");
+            log_die("missing view 'headers_localtime' in database $database_file");
         }
 
         return $database_handle;
@@ -183,4 +245,63 @@ END_SQL
 sub exit_handler {
     $Exit = 1;
 }
+
+# TODO: write documentation
+
+__END__
+=head1 NAME
+
+NetFlow::Parser - Perl extension for parsing Netflow version 5 binary data
+
+=head1 SYNOPSIS
+
+    use NetFlow::Parser;
+    my $parser = NetFlow::Parser->new();
+    my $packet = $parser->parse($binary_packet_data);
+
+=head1 DESCRIPTION
+
+Object oriented module for parsing Netflow version 5 binary
+data. Returns Netflow data as NetFlow::Packet objects. This
+module is meant to be used with NetFlow::Flow and NetFlow::Packet.
+
+=head1 METHODS
+
+=head2 debug
+
+Turn debug on or off. Set to 0 to turn off debug. Set to > 1 to
+turn on debug. By default debug is off.
+
+=head2 new
+
+Returns a new NetFlow::Parser object. Only accepts the optional
+debug parameter.
+
+=head2 parse
+
+Parse binary Netflow version 5 data. Returns a NetFlow::Packet
+object.
+
+=head1 SEE ALSO
+
+Read the documentation for Perl modules
+NetFlow::Flow and NetFlow::Packet.
+
+=head1 BUGS
+
+No known bugs at this time.
+
+=head1 AUTHOR
+
+Sean Malloy,  E<lt>spinelli85@gmail.com@E<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011 by Sean Malloy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself,  either Perl version 5.10.1 or, 
+at your option,  any later version of Perl 5 you may have available.
+
+=cut
 
