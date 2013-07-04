@@ -45,12 +45,12 @@ $SIG{'TERM'} = 'exit_handler';
 # --listen-address
 # --log-level
 
-my ($Config_File, $Database_File, $Group, $Help, $Manual, $Pid_File, $Port, $User);
+my ($Config_File, $Database_File, $Group, $Help, $Man_Page, $Pid_File, $Port, $User);
 if (!GetOptions('config-file=s' => \$Config_File,
                 'database=s'    => \$Database_File,
                 'group=s'       => \$Group,
                 'help'          => \$Help,
-                'manual'        => \$Manual,
+                'manpage'       => \$Man_Page,
                 'pid-file=s'    => \$Pid_File,
                 'port=i'        => \$Port,
                 'user=s'        => \$User, )) {
@@ -65,7 +65,7 @@ if ($Help) {
     );
 }
 
-if ($Manual) {
+if ($Man_Page) {
     pod2usage(-exitval => 0,
               -verbose => 2,
     );
@@ -272,54 +272,82 @@ sub exit_handler {
     $Exit = 1;
 }
 
-# TODO: write documentation
-
 __END__
 =head1 NAME
 
-NetFlow::Parser - Perl extension for parsing Netflow version 5 binary data
+server.pl - Netflow Collector Daemon
 
 =head1 SYNOPSIS
 
-    use NetFlow::Parser;
-    my $parser = NetFlow::Parser->new();
-    my $packet = $parser->parse($binary_packet_data);
+    server.pl --config-file <FILE> [--database <DB>] [--group <GROUP>] [--pid-file <FILE>] [--port <PORT>] [--user <USER>]
+    server.pl --help
+    server.pl --manpage
 
 =head1 DESCRIPTION
 
-Object oriented module for parsing Netflow version 5 binary
-data. Returns Netflow data as NetFlow::Packet objects. This
-module is meant to be used with NetFlow::Flow and NetFlow::Packet.
+Netflow collector daemon. Only supports Netflow v5.
 
-=head1 METHODS
+=head1 OPTIONS
 
-=head2 debug
+=over
 
-Turn debug on or off. Set to 0 to turn off debug. Set to > 1 to
-turn on debug. By default debug is off.
+=item --config-file I<FILE>
 
-=head2 new
+Path to configuration file. This option is required.
 
-Returns a new NetFlow::Parser object. Only accepts the optional
-debug parameter.
+=item --database I<DB>
 
-=head2 parse
+Path to SQLite database file.
 
-Parse binary Netflow version 5 data. Returns a NetFlow::Packet
-object.
+=item --group I<GROUP>
 
-=head1 SEE ALSO
+UNIX group to run as.
 
-Read the documentation for Perl modules
-NetFlow::Flow and NetFlow::Packet.
+=item --help
 
-=head1 BUGS
+Display help and exit.
+
+=item --manpage
+
+Display entire manual and exit.
+
+=item --pid-file I<FILE>
+
+Path to the PID file. Default is /var/run/server.pid.
+
+=item --port I<PORT>
+
+UDP port daemon listens on for Netflow data. Default is 1234.
+
+=item --user I<USER>
+
+Unix group to run as.
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Update with configuration file information
+and/or environment variable information.
+
+=head1 EXAMPLE USAGE
+
+Document example usage here.
+
+    ./template.pl --foo
+
+=head1 BUGS AND LIMITATIONS
 
 No known bugs at this time.
 
+=head1 SEE ALSO
+
+Netflow Export Datagram Format
+    http://www.cisco.com/en/US/docs/net_mgmt/netflow_collection_engine/3.6/user/guide/format.html
+
 =head1 AUTHOR
 
-Sean Malloy,  E<lt>spinelli85@gmail.com@E<gt>
+Sean Malloy, E<lt>spinelli85@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

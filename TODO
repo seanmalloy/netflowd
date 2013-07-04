@@ -21,6 +21,7 @@ Database Tasks
 
 Main Daemon Tasks
 -----------------
+* Finish writing POD documentation.
 * Clean up any "todo" items.
 * Add to command line options and config file
   * --log-level
