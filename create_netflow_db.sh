@@ -2,7 +2,12 @@
 
 # Create Netflow SQLite database.
 
-sqlite3 netflow.db << EOF
+MY_DB_FILE="$1"
+if [ -z "$MY_DB_FILE" ]; then
+    MY_DB_FILE="netflow.db"
+fi
+
+sqlite3 $MY_DB_FILE << EOF
 
 -- Table for Netflow headers
 CREATE TABLE IF NOT EXISTS headers (
