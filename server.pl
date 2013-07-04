@@ -94,18 +94,18 @@ sub create_database {
         }
 
         # Exit if headers table does not exist.
-        if ( scalar(grep { $_ eq 'headers' } $database_handle->tables(undef, undef, 'headers', 'TABLE')) != 1) {
+        if (scalar($database_handle->tables(undef, undef, 'headers', 'TABLE')) != 1) {
             log_die("Missing table 'headers' in database $database_file");
         }
 
         # Exit if flows table does not exist.
-        if (scalar(grep { $_ eq 'flows' } $database_handle->tables(undef, undef, 'flows' , 'TABLE')) != 1) {
+        if (scalar($database_handle->tables(undef, undef, 'flows' , 'TABLE')) != 1) {
             log_die("Missing table 'flows' in database $database_file");
         }
 
         # Exit if view does not exist.
-        if (scalar(grep { $_ eq 'headers_localtime' } $database_handle->tables(undef, undef, 'headers_localtime' , 'VIEW')) != 1) {
-            log_die("Missing view 'fheaders_localtime' in database $database_file");
+        if (scalar($database_handle->tables(undef, undef, 'headers_localtime' , 'VIEW')) != 1) {
+            log_die("Missing view 'headers_localtime' in database $database_file");
         }
 
         return $database_handle;
