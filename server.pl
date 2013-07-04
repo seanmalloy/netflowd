@@ -118,7 +118,7 @@ init_server_user($Pid_File, $User, $Group);
 my $Database_Handle = create_database($Database_File);
 my $Exit = 0;
 
-my ($Maximum_Length, $data);
+my ($Maximum_Length, $Data);
 # Maximum packet size for Netflow v5.
 # 24 + (30 * 48) = 1464 bytes
 # Header: 24 bytes
@@ -141,7 +141,7 @@ while (!$Exit) {
     }
 
     
-    if (!$Sock->recv($data, $Maximum_Length)) {
+    if (!$Sock->recv($Data, $Maximum_Length)) {
         $Sock->close();
         undef $Sock;
         log_warn("UDP packet receive error: $OS_ERROR", "\n");
@@ -150,7 +150,7 @@ while (!$Exit) {
 
     my ($port, $ip) = sockaddr_in($Sock->peername);
     my $client = gethostbyaddr($ip, AF_INET);
-    $Packet = $parser->parse($data);
+    $Packet = $parser->parse($Data);
     log_notice("inserting into headers table", "\n");
     $Header_Statement_Handle->execute( $Packet->version(), $Packet->count(), $Packet->sys_uptime(), $Packet->unix_secs(), $Packet->unix_nsecs(), $Packet->flow_sequence(), $Packet->engine_type(), $Packet->engine_id, $Packet->sampling_mode, $Packet->sampling_interval() );
     $Header_Primary_Key = $Database_Handle->last_insert_id("", "", "", "");
