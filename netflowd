@@ -110,7 +110,7 @@ if (!defined $Port) {
     $Port = 1234;
 }
 if (!defined $Pid_File) {
-    $Pid_File = '/var/run/server.pid';
+    $Pid_File = '/var/run/netflowd.pid';
 } 
 
 init_server_user($Pid_File, $User, $Group);
@@ -275,13 +275,13 @@ sub exit_handler {
 __END__
 =head1 NAME
 
-server.pl - Netflow Collector Daemon
+netflowd - Netflow Collector Daemon
 
 =head1 SYNOPSIS
 
-    server.pl --config-file <FILE> [--database <DB>] [--group <GROUP>] [--pid-file <FILE>] [--port <PORT>] [--user <USER>]
-    server.pl --help
-    server.pl --manpage
+    netflowd --config-file <FILE> [--database <DB>] [--group <GROUP>] [--pid-file <FILE>] [--port <PORT>] [--user <USER>]
+    netflowd --help
+    netflowd --manpage
 
 =head1 DESCRIPTION
 
@@ -313,7 +313,7 @@ Display entire manual and exit.
 
 =item --pid-file I<FILE>
 
-Path to the PID file. Default is /var/run/server.pid.
+Path to the PID file. Default is /var/run/netflowd.pid.
 
 =item --port I<PORT>
 
