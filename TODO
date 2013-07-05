@@ -17,15 +17,15 @@ SPM Module Tasks
 Database Tasks
 --------------
 * Fix unix_seconds in the headers_localtime view.
+* Store netflowd version information in SQLite database?
 * Create database tests.
 
 Main Daemon Tasks
 -----------------
 * Configuraton file error handling.
-* Clean up any "todo" items.
-* Add to command line options and config file
-  * --log-level
-  * --listen-address
+* Clean up any TODO items.
+* Do something useful with $Log_Level.
+* Do something useful with $Listen_Address.
 * Add Test::Perl::Critic tests.
 * Convert to Dist::Zilla?
 

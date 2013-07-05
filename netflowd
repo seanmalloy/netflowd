@@ -41,19 +41,17 @@ use Pod::Usage;
 $SIG{'INT'}  = 'exit_handler';
 $SIG{'TERM'} = 'exit_handler';
 
-# TODO: Add to command line options
-# --listen-address
-# --log-level
-
-my ($Config_File, $Database_File, $Group, $Help, $Man_Page, $Pid_File, $Port, $User);
-if (!GetOptions('config-file=s' => \$Config_File,
-                'database=s'    => \$Database_File,
-                'group=s'       => \$Group,
-                'help'          => \$Help,
-                'manpage'       => \$Man_Page,
-                'pid-file=s'    => \$Pid_File,
-                'port=i'        => \$Port,
-                'user=s'        => \$User, )) {
+my ($Config_File, $Database_File, $Group, $Help, $Listen_Address, $Log_Level, $Man_Page, $Pid_File, $Port, $User);
+if (!GetOptions('config-file=s'    => \$Config_File,
+                'database=s'       => \$Database_File,
+                'group=s'          => \$Group,
+                'help'             => \$Help,
+                'listen-address=s' => \$Listen_Address,
+                'log-level=s'      => \$Log_Level,
+                'manpage'          => \$Man_Page,
+                'pid-file=s'       => \$Pid_File,
+                'port=i'           => \$Port,
+                'user=s'           => \$User, )) {
     pod2usage(-exitval => 1,
               -verbose => 1, 
     );
@@ -80,10 +78,6 @@ if (!defined $Config_File) {
     );
 }
 
-# Parse Config File
-# TODO: Add to config file
-# --listen-address
-# --log-level
 my $Config = new Config::Simple($Config_File);
 
 if (!defined $Database_File) {
@@ -101,6 +95,14 @@ if (!defined $Pid_File) {
     $Pid_File = $Config->param('general.pid-file');
 }
 
+if (!defined $Listen_Address) {
+    $Listen_Address = $Config->param('network.listen-address');
+}
+
+if (!defined $Log_Level) {
+    $Log_Level = $Config->param('general.log-level');
+}
+
 if (!defined $Port) {
     $Port = $Config->param('network.port');
 }
@@ -112,6 +114,9 @@ if (!defined $Port) {
 if (!defined $Pid_File) {
     $Pid_File = '/var/run/netflowd.pid';
 } 
+if (!defined $Log_Level) {
+    $Log_Level = 'info';
+}
 
 init_server_user($Pid_File, $User, $Group);
 
@@ -167,8 +172,14 @@ sub clean_up {
     $Database_Handle->disconnect;
 }
 
-# TODO: document this function
-# Returns: DBI database handle
+#############################################
+# Usage      : create_database('/path/to/db/file.db')
+# Purpose    : Connects to and/or creates SQLite database
+# Returns    : DBI database handle
+# Parameters : Path to database file
+# Throws     : Various exceptions
+# Comments   : none
+# See Also   : n/a
 sub create_database {
     my $database_file = shift;
     if (!defined $database_file) {
@@ -279,7 +290,8 @@ netflowd - Netflow Collector Daemon
 
 =head1 SYNOPSIS
 
-  netflowd --config-file <FILE> [--database <DB>] [--group <GROUP>] [--pid-file <FILE>] [--port <PORT>] [--user <USER>]
+  netflowd --config-file <FILE> [--database <DB>] [--group <GROUP>] [--listen-address <IP>] [--log-level <LEVEL>]
+                                [--pid-file <FILE>] [--port <PORT>] [--user <USER>]
   netflowd --help
   netflowd --manpage
 
@@ -306,6 +318,16 @@ UNIX group to run as.
 =item --help
 
 Display help and exit.
+
+=item --listen-address I<IP>
+
+Listen on IP address I<IP>.
+
+=item --log-level I<LEVEL>
+
+Set log level to I<LEVEL>. Allowed values for
+I<LEVEL> are debug, info, warn, or error. Default log
+level is info.
 
 =item --manpage
 
@@ -335,12 +357,14 @@ Example configuraton file:
   user = netflowd
   group = netflowd
   pid-file = /var/run/netflowd.pid
+  log-level = debug
 
   [database]
   file = /var/netflowd/netflowd.db
 
   [network]
   port = 1234
+  listen-address = 127.0.0.1
 
 =head1 EXAMPLE USAGE
 
