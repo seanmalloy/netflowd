@@ -30,7 +30,7 @@
 
 MY_DB_FILE="$1"
 if [ -z "$MY_DB_FILE" ]; then
-    MY_DB_FILE="netflow.db"
+    MY_DB_FILE="netflowd.db"
 fi
 
 sqlite3 $MY_DB_FILE << EOF
