@@ -279,9 +279,9 @@ netflowd - Netflow Collector Daemon
 
 =head1 SYNOPSIS
 
-    netflowd --config-file <FILE> [--database <DB>] [--group <GROUP>] [--pid-file <FILE>] [--port <PORT>] [--user <USER>]
-    netflowd --help
-    netflowd --manpage
+  netflowd --config-file <FILE> [--database <DB>] [--group <GROUP>] [--pid-file <FILE>] [--port <PORT>] [--user <USER>]
+  netflowd --help
+  netflowd --manpage
 
 =head1 DESCRIPTION
 
@@ -321,20 +321,30 @@ UDP port daemon listens on for Netflow data. Default is 1234.
 
 =item --user I<USER>
 
-Unix group to run as.
+Unix user to run as.
 
 =back
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-Update with configuration file information
-and/or environment variable information.
+Command line options take precedence over the configuraiton
+file. Lines that start with the # symobl are comments.
+
+Example configuraton file:
+  [general]
+  user = netflowd
+  group = netflowd
+  pid-file = /var/run/netflowd.pid
+
+  [database]
+  file = /var/netflowd/netflowd.db
+
+  [network]
+  port = 1234
 
 =head1 EXAMPLE USAGE
 
-Document example usage here.
-
-    ./template.pl --foo
+    netflowd --config-file /usr/local/etc/netflowd.conf
 
 =head1 BUGS AND LIMITATIONS
 
