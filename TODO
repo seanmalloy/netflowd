@@ -1,31 +1,39 @@
-NetFlow Module Tasks
---------------------
-* Add Test::Kwalitee tests.
-* Review POD Tests (Test::Pod, Test::Pod::Coverage)
-* Test Netflow::Parser module on little and big
-  endian architectures.
-* Convert to Dist::Zilla?
+Version 0.1 TODO List
+---------------------
+    NetFlow Module Tasks
+    --------------------
+    * Add Test::Kwalitee tests.
+    * Review POD Tests (Test::Pod, Test::Pod::Coverage)
+    * Test Netflow::Parser module on little and big
+      endian architectures.
+    * Convert to Dist::Zilla?
+    
+    SPM Module Tasks
+    ----------------
+    * Add Test::Kwalitee tests.
+    * Review POD Tests (Test::Pod, Test::Pod::Coverage)
+    * Make SPM::Daemon use exceptions instead of Carp module.
+    * Write tests for SPM::Daemon.
+    * Convert to Dist::Zilla?
+    
+    Database Tasks
+    --------------
+    * Fix unix_seconds in the headers_localtime view.
+    * Store netflowd version information in SQLite database?
+    * Create database tests.
+    
+    Main Daemon Tasks
+    -----------------
+    * Configuraton file error handling.
+    * Clean up any TODO items.
+    * Do something useful with $Log_Level.
+    * Add Test::Perl::Critic tests.
+    * Convert to Dist::Zilla?
 
-SPM Module Tasks
-----------------
-* Add Test::Kwalitee tests.
-* Review POD Tests (Test::Pod, Test::Pod::Coverage)
-* Make SPM::Daemon use exceptions instead of Carp module.
-* Write tests for SPM::Daemon.
-* Convert to Dist::Zilla?
-
-Database Tasks
---------------
-* Fix unix_seconds in the headers_localtime view.
-* Store netflowd version information in SQLite database?
-* Create database tests.
-
-Main Daemon Tasks
------------------
-* Configuraton file error handling.
-* Clean up any TODO items.
-* Do something useful with $Log_Level.
-* Do something useful with $Listen_Address.
-* Add Test::Perl::Critic tests.
-* Convert to Dist::Zilla?
+Future Versions TODO List
+-------------------------
+* IPv6 support.
+* Command line option to only parse configuration and exit.
+* Command line option to run in the foreground.
+* HUP signal handler to re-read configuration.
 
