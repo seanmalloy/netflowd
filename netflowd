@@ -42,13 +42,12 @@ use File::Basename;
 $SIG{'INT'}  = 'exit_handler';
 $SIG{'TERM'} = 'exit_handler';
 
-my ($Config_File, $Database_File, $Group, $Help, $Listen_Address, $Log_Level, $Man_Page, $Pid_File, $Port, $User);
+my ($Config_File, $Database_File, $Group, $Help, $Listen_Address, $Man_Page, $Pid_File, $Port, $User);
 if (!GetOptions('config-file=s'    => \$Config_File,
                 'database=s'       => \$Database_File,
                 'group=s'          => \$Group,
                 'help'             => \$Help,
                 'listen-address=s' => \$Listen_Address,
-                'log-level=s'      => \$Log_Level,
                 'manpage'          => \$Man_Page,
                 'pid-file=s'       => \$Pid_File,
                 'port=i'           => \$Port,
@@ -105,10 +104,6 @@ if (!defined $Listen_Address) {
     $Listen_Address = $Config->param('network.listen-address');
 }
 
-if (!defined $Log_Level) {
-    $Log_Level = $Config->param('general.log-level');
-}
-
 if (!defined $Port) {
     $Port = $Config->param('network.port');
 }
@@ -120,26 +115,25 @@ if (!defined $Port) {
 if (!defined $Pid_File) {
     $Pid_File = '/var/run/' . basename($PROGRAM_NAME). '.pid';
 } 
-if (!defined $Log_Level) {
-    $Log_Level = 'info';
-}
 if (!defined $Listen_Address) {
     $Listen_Address = '0.0.0.0';
 }
 
 init_server_user($Pid_File, $User, $Group);
+log_notice("Daemon started successfully", "\n");
 
 my $Database_Handle = create_database($Database_File);
 my $Exit = 0;
 
-my ($Maximum_Length, $Data);
+my $parser = NetFlow::Parser->new();
+
 # Maximum packet size for Netflow v5.
 # 24 + (30 * 48) = 1464 bytes
 # Header: 24 bytes
 # Each Flow: 48 bytes (can be 1 to 30 flows per packet)
-my $parser = NetFlow::Parser->new();
-$Maximum_Length = 1464;
+my $Maximum_Length = 1464;
 my $Packet;
+my $Data;
 
 my $Header_Statement_Handle = $Database_Handle->prepare("INSERT INTO headers(version, count, system_uptime, unix_seconds, unix_nano_seconds, flow_sequence, engine_type, engine_id, sampling_mode, sampling_interval) VALUES (?,?,?,?,?,?,?,?,?,?)");
 my $Flow_Statement_Handle   = $Database_Handle->prepare("INSERT INTO flows(source_ip_address, destination_ip_address, next_hop_ip_address, snmp_input_index, snmp_output_index, packets, bytes, start_system_uptime, end_system_uptime, source_port, destination_port, tcp_flags, ip_protocol, type_of_service, source_system_number, destination_system_number, source_mask, destination_mask, header_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
@@ -151,7 +145,7 @@ while (!$Exit) {
     if (!defined $Sock) {
         $Sock = new IO::Socket::INET( LocalAddr => $Listen_Address, LocalPort => $Port, Proto => 'udp' )
             or die "socket: $EVAL_ERROR";
-        log_notice("listening on $Listen_Address port $Port", "\n");
+        log_notice("Listening on $Listen_Address port $Port", "\n");
     }
 
     
@@ -162,14 +156,13 @@ while (!$Exit) {
         next MAIN;
     }
 
-    my ($port, $ip) = sockaddr_in($Sock->peername);
-    my $client = gethostbyaddr($ip, AF_INET);
+    my $peer_port = $Sock->peerport();
+    my $peer_ip   = $Sock->peerhost();
+    log_notice("Received netfow data from $peer_ip port $peer_port", "\n");
     $Packet = $parser->parse($Data);
-    log_notice("inserting into headers table", "\n");
     $Header_Statement_Handle->execute( $Packet->version(), $Packet->count(), $Packet->sys_uptime(), $Packet->unix_secs(), $Packet->unix_nsecs(), $Packet->flow_sequence(), $Packet->engine_type(), $Packet->engine_id, $Packet->sampling_mode, $Packet->sampling_interval() );
     $Header_Primary_Key = $Database_Handle->last_insert_id("", "", "", "");
     for my $flow (@{$Packet->flows()}) {
-        log_notice("inserting into flows table", "\n");
         $Flow_Statement_Handle->execute( $flow->srcaddr(), $flow->dstaddr(), $flow->nexthop(), $flow->input(), $flow->output(), $flow->packets(), $flow->bytes(), $flow->first(), $flow->last(), $flow->srcport(), $flow->dstport(), $flow->tcpflags(), $flow->protocol(), $flow->tos(), $flow->srcas(), $flow->dstas(), $flow->srcmask(), $flow->dstmask(), $Header_Primary_Key );
     }
 }
@@ -177,7 +170,7 @@ clean_up();
 exit 0;
 
 sub clean_up {
-    log_notice("disconnecting from database $Database_File", "\n");
+    log_notice("Disconnecting from database $Database_File", "\n");
     $Database_Handle->disconnect;
 }
 
@@ -192,10 +185,11 @@ sub clean_up {
 sub create_database {
     my $database_file = shift;
     if (!defined $database_file) {
-        log_die("cannot connect to database: missing database connection informtion");
+        log_die("Cannot connect to database: missing database connection informtion");
     }
 
     if (-f $database_file) {
+        log_notice("Connecting to existing database $database_file", "\n");
         my $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
         if (!defined $database_handle) {
             log_die("cannot connect to database $database_file: $DBI::errstr");
@@ -220,6 +214,7 @@ sub create_database {
     }
 
     # Create Database Tables
+    log_notice("Creating new database $database_file", "\n");
     my $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
 
     my $create_headers_table_sql = <<'END_SQL';
@@ -289,6 +284,8 @@ END_SQL
 }
 
 sub exit_handler {
+    my $signal = shift;
+    log_notice("Received signal $signal", "\n");
     $Exit = 1;
 }
 
@@ -299,7 +296,7 @@ netflowd - Netflow Collector Daemon
 
 =head1 SYNOPSIS
 
-  netflowd --config-file <FILE> [--database <DB>] [--group <GROUP>] [--listen-address <IP>] [--log-level <LEVEL>]
+  netflowd --config-file <FILE> [--database <DB>] [--group <GROUP>] [--listen-address <IP>]
                                 [--pid-file <FILE>] [--port <PORT>] [--user <USER>]
   netflowd --help
   netflowd --manpage
@@ -333,12 +330,6 @@ Display help and exit.
 Listen on IP address I<IP>. Default listen address
 is 0.0.0.0. Only supports IP version 4.
 
-=item --log-level I<LEVEL>
-
-Set log level to I<LEVEL>. Allowed values for
-I<LEVEL> are debug, info, warn, or error. Default log
-level is info.
-
 =item --manpage
 
 Display entire manual and exit.
@@ -367,7 +358,6 @@ Example configuraton file:
   user = netflowd
   group = netflowd
   pid-file = /var/run/netflowd.pid
-  log-level = debug
 
   [database]
   file = /var/netflowd/netflowd.db

@@ -24,7 +24,6 @@ Version 0.1 TODO List
     
     Main Daemon Tasks
     -----------------
-    * Do something useful with $Log_Level.
     * Add Test::Perl::Critic tests.
     * Convert to Dist::Zilla?
 
@@ -35,5 +34,6 @@ Future Versions TODO List
 * Chroot support.
 * Command line option to only parse configuration and exit.
 * Command line option to run in the foreground.
+* Implement --log-level command line and config file option
 * HUP signal handler to re-read configuration.
 
