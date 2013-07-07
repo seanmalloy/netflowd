@@ -24,7 +24,6 @@ Version 0.1 TODO List
     
     Main Daemon Tasks
     -----------------
-    * Clean up any TODO items.
     * Do something useful with $Log_Level.
     * Add Test::Perl::Critic tests.
     * Convert to Dist::Zilla?
@@ -32,6 +31,8 @@ Version 0.1 TODO List
 Future Versions TODO List
 -------------------------
 * IPv6 support.
+* Support Netflow version other than v5.
+* Chroot support.
 * Command line option to only parse configuration and exit.
 * Command line option to run in the foreground.
 * HUP signal handler to re-read configuration.

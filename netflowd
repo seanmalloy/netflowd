@@ -69,12 +69,11 @@ if ($Man_Page) {
     );
 }
 
-# TODO: handle this better? different error message?
 if (!defined $Config_File) {
-    my $error_message = "--config-file option missing";
+    my $error_message = "Missing required command line option: --config-file";
     pod2usage(-exitval => 1,
               -msg     => $error_message,
-              -verbose => 1,
+              -verbose => 0,
     );
 }
 
