@@ -36,6 +36,7 @@ use SPM::Daemon qw( init_server_user log_die log_notice log_warn );
 use DBI;
 use Config::Simple;
 use Pod::Usage;
+use File::Basename;
 
 # Signal Handlers
 $SIG{'INT'}  = 'exit_handler';
@@ -117,7 +118,7 @@ if (!defined $Port) {
     $Port = 1234;
 }
 if (!defined $Pid_File) {
-    $Pid_File = '/var/run/netflowd.pid';
+    $Pid_File = '/var/run/' . basename($PROGRAM_NAME). '.pid';
 } 
 if (!defined $Log_Level) {
     $Log_Level = 'info';
