@@ -24,7 +24,6 @@ Version 0.1 TODO List
     
     Main Daemon Tasks
     -----------------
-    * Configuraton file error handling.
     * Clean up any TODO items.
     * Do something useful with $Log_Level.
     * Add Test::Perl::Critic tests.

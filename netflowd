@@ -78,7 +78,13 @@ if (!defined $Config_File) {
     );
 }
 
-my $Config = new Config::Simple($Config_File);
+my $Config;
+eval {
+    $Config = new Config::Simple($Config_File);
+}; if ($EVAL_ERROR) {
+    print "Failed to parse configuration file $Config_File: ", Config::Simple->error(), "\n";
+    exit 1;
+}
 
 if (!defined $Database_File) {
     $Database_File = $Config->param('database.file');
