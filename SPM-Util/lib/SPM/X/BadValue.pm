@@ -26,6 +26,7 @@ package SPM::X::BadValue;
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+use 5.016_001;
 use Moose;
  
 with qw(Throwable::X);

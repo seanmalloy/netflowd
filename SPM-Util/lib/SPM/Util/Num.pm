@@ -26,7 +26,7 @@ package SPM::Util::Num;
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-use 5.010001;
+use 5.016_001;
 use strict;
 use warnings;
 use SPM::X::BadValue;
