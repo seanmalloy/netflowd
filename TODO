@@ -12,16 +12,14 @@ Version 0.1 TODO List
     * Write tests for SPM::Daemon.
     * Use Pod::Weaver
     
-    Database Tasks
-    --------------
-    * Fix unix_seconds in the headers_localtime view.
-    * Store netflowd version information in SQLite database?
-    * Create database tests.
-    
-    Main Daemon Tasks
-    -----------------
+    App::Netflowd Module Tasks
+    --------------------------
     * Convert to a Perl module
     * Convert to Dist::Zilla
+    * Conver create_netflowd_db.sh to Perl.
+    * Fix unix_seconds in the headers_localtime view.
+    * Store netflowd version information in SQLite database
+    * Create database tests.
     * Use Pod::Weaver
 
 Future Versions TODO List

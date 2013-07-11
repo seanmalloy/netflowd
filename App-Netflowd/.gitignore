@@ -1,0 +1,6 @@
+App-Netflowd-*
+*.db
+*.gz
+*.swp
+.gitnxtver_cache
+
