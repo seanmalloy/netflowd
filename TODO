@@ -2,12 +2,10 @@ Version 0.1 TODO List
 ---------------------
     NetFlow Module Tasks
     --------------------
-    * Add Test::Kwalitee tests.
-    * Review POD Tests (Test::Pod, Test::Pod::Coverage)
     * Test Netflow::Parser module on little and big
       endian architectures.
     * Convert to Dist::Zilla?
-    
+
     SPM Module Tasks
     ----------------
     * Add Test::Kwalitee tests.
