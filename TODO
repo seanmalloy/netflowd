@@ -4,15 +4,14 @@ Version 0.1 TODO List
     --------------------
     * Test Netflow::Parser module on little and big
       endian architectures.
-    * Convert to Dist::Zilla?
+    * Use Pod::Weaver
 
     SPM Module Tasks
     ----------------
-    * Add Test::Kwalitee tests.
-    * Review POD Tests (Test::Pod, Test::Pod::Coverage)
+    * Convert to Dist::Zilla
     * Make SPM::Daemon use exceptions instead of Carp module.
     * Write tests for SPM::Daemon.
-    * Convert to Dist::Zilla?
+    * Use Pod::Weaver
     
     Database Tasks
     --------------
@@ -22,8 +21,9 @@ Version 0.1 TODO List
     
     Main Daemon Tasks
     -----------------
-    * Add Test::Perl::Critic tests.
-    * Convert to Dist::Zilla?
+    * Convert to a Perl module
+    * Convert to Dist::Zilla
+    * Use Pod::Weaver
 
 Future Versions TODO List
 -------------------------
