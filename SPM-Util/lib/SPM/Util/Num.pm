@@ -26,9 +26,10 @@ package SPM::Util::Num;
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-use 5.016_001;
+use 5.16.1;
 use strict;
 use warnings;
+use SPM::Util qw( is_defined isnt_reference );
 use SPM::X::BadValue;
 require Exporter;
 
@@ -39,8 +40,8 @@ our $VERSION   = '0.01';
 # Convert a number from binary to decimal.
 sub bin2dec {
     my $num = shift;
-    _check_undef($num);
-    _check_reference($num);
+    is_defined($num);
+    isnt_reference($num);
     
     # Only binary number are valid input.
     if ($num !~ /^[0-1]+$/) {
@@ -63,8 +64,8 @@ sub bin2dec {
 # Convert a 32 bit IPv4 address to dotted quad notation.
 sub bin2dottedquad {
     my $ipv4 = shift;
-    _check_undef($ipv4);
-    _check_reference($ipv4);
+    is_defined($ipv4);
+    isnt_reference($ipv4);
 
     # Only binary number are valid input.
     if ($ipv4 !~ /^[0-1]+$/) {
@@ -97,8 +98,8 @@ sub bin2dottedquad {
 # Convert a number from decimal to binary.
 sub dec2bin {
     my $num = shift;
-    _check_undef($num);
-    _check_reference($num);
+    is_defined($num);
+    isnt_reference($num);
 
     # Only numbers are valid input.
     if ($num !~ /^\d+$/) {
@@ -113,37 +114,6 @@ sub dec2bin {
 
     }
     return(sprintf("%b", $num));
-}
-
-sub _check_reference {
-    my $parameter = shift;
-    if (ref($parameter) ne '') {
-        SPM::X::BadValue->throw({
-            ident   => 'bad parameter',
-            tags    => [ qw(reference) ],
-            public  => 1,
-            message => "invalid parameter %{given_value}s for %{given_for}s",
-            given_value => ref($parameter) . ' reference',
-            given_for   => 'reference test',
-        });
-
-    }
-    return $parameter;
-}
-
-sub _check_undef {
-    my $parameter = shift;
-    if (!defined $parameter) {
-        SPM::X::BadValue->throw({
-            ident   => 'bad parameter',
-            tags    => [ qw(undef) ],
-            public  => 1,
-            message => "invalid parameter %{given_value}s for %{given_for}s",
-            given_value => 'undef',
-            given_for   => 'undef test',
-        });
-    }
-    return $parameter;
 }
 
 1;
