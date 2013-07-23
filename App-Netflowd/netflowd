@@ -32,7 +32,8 @@ use English qw( -no_match_vars );
 use IO::Socket;
 use NetFlow::Parser;
 use Getopt::Long;
-use SPM::Daemon qw( init_server_user log_die log_notice log_warn );
+use SPM::Daemon qw( init_server_user );
+use SPM::Syslog qw( log_die log_error log_info log_warn );
 use DBI;
 use Config::Simple;
 use Pod::Usage;
@@ -123,7 +124,7 @@ if (!defined $Listen_Address) {
 init_server_user($Pid_File, $User, $Group);
 ### All syslog calls must go below this line ###
 
-log_notice("Daemon started successfully", "\n");
+log_info("Daemon started successfully", "\n");
 
 my $Database_Handle = connect_netflowd_database($Database_File);
 
@@ -149,7 +150,7 @@ while (!$Exit) {
     if (!defined $Sock) {
         $Sock = new IO::Socket::INET( LocalAddr => $Listen_Address, LocalPort => $Port, Proto => 'udp' )
             or die "socket: $EVAL_ERROR";
-        log_notice("Listening on $Listen_Address port $Port", "\n");
+        log_info("Listening on $Listen_Address port $Port", "\n");
     }
 
     
@@ -162,7 +163,7 @@ while (!$Exit) {
 
     my $peer_port = $Sock->peerport();
     my $peer_ip   = $Sock->peerhost();
-    log_notice("Received netfow data from $peer_ip port $peer_port", "\n");
+    log_info("Received netfow data from $peer_ip port $peer_port", "\n");
     $Packet = $parser->parse($Data);
     $Header_Statement_Handle->execute( $Packet->version(), $Packet->count(), $Packet->sys_uptime(), $Packet->unix_secs(), $Packet->unix_nsecs(), $Packet->flow_sequence(), $Packet->engine_type(), $Packet->engine_id, $Packet->sampling_mode, $Packet->sampling_interval() );
     $Header_Primary_Key = $Database_Handle->last_insert_id("", "", "", "");
@@ -174,13 +175,13 @@ clean_up();
 exit 0;
 
 sub clean_up {
-    log_notice("Disconnecting from database $Database_File", "\n");
+    log_info("Disconnecting from database $Database_File", "\n");
     $Database_Handle->disconnect;
 }
 
 sub exit_handler {
     my $signal = shift;
-    log_notice("Received signal $signal", "\n");
+    log_info("Received signal $signal", "\n");
     $Exit = 1;
 }
 
