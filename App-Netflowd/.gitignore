@@ -1,4 +1,4 @@
-App-Netflowd-*
+App-Netflowd-*/
 *.db
 *.gz
 *.swp
