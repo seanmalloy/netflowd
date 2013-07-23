@@ -40,7 +40,7 @@ our $VERSION   = '0.01';
 #############################################
 # Usage      : is_defined(scalar)
 # Purpose    : Test if a scalar is defined
-# Returns    : True if scalar in is defined
+# Returns    : True if scalar is defined
 # Parameters : Scalar variable
 # Throws     : SPM::X::BadValue if scalar input is undef
 # Comments   : none
@@ -87,25 +87,23 @@ sub is_reference {
 #############################################
 # Usage      : isnt_defined(scalar)
 # Purpose    : Tests if a scalar is undef
-# Returns    : True if scalar in is undef
+# Returns    : True if scalar is undef
 # Parameters : Scalar variable
 # Throws     : SPM::X::BadValue if scalar input is defined
 # Comments   : none
 # See Also   : perldoc -f defined, perldoc -f undef, SPM::Util::is_defined
 sub isnt_defined {
     my $parameter = shift;
-    eval {
-        is_defined($parameter)
-    }; if ($EVAL_ERROR) {
+    if (! defined $parameter) {
         return 1;
     }
     SPM::X::BadValue->throw({
-            ident   => 'bad parameter', 
-            tags    => [ qw(defined) ], 
-            public  => 1, 
-            message => "invalid parameter %{given_value}s for %{given_for}s", 
-            given_value => $parameter, 
-            given_for   => 'isnt_defined()', 
+        ident   => 'bad parameter', 
+        tags    => [ qw(defined) ], 
+        public  => 1, 
+        message => "invalid parameter %{given_value}s for %{given_for}s", 
+        given_value => $parameter, 
+        given_for   => 'isnt_defined()', 
     });
 }
 
@@ -119,18 +117,16 @@ sub isnt_defined {
 # See Also   : perldoc -f ref
 sub isnt_reference {
     my $parameter = shift;
-    eval {
-        is_reference($parameter)
-    }; if ($EVAL_ERROR) {
+    if (ref($parameter) eq '') {
         return 1;
     }
     SPM::X::BadValue->throw({
-            ident   => 'bad parameter',
-            tags    => [ qw(reference) ],
-            public  => 1,
-            message => "invalid parameter %{given_value}s for %{given_for}s",
-            given_value => $parameter,
-            given_for   => 'isnt_reference()',
+        ident   => 'bad parameter',
+        tags    => [ qw(reference) ],
+        public  => 1,
+        message => "invalid parameter %{given_value}s for %{given_for}s",
+        given_value => $parameter,
+        given_for   => 'isnt_reference()',
     });
 }
 
@@ -188,7 +184,7 @@ No known bugs at this time.
 
 =head1 AUTHOR
 
-Sean Malloy, E<lt>spinelli85@gmail.com@E<gt>
+Sean Malloy, E<lt>spinelli85@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

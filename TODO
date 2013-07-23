@@ -8,15 +8,19 @@ Version 0.1 TODO List
 
     SPM Module Tasks
     ----------------
+    * Test die signal handler in SPM::Daemon.
     * Make SPM::Daemon use exceptions instead of Carp module.
+    * Make SPM::Syslog use exceptions instead of Carp module.
     * Write tests for SPM::Daemon.
+    * Write tests for SPM::Syslog.
     * Use Pod::Weaver
     
     App::Netflowd Module Tasks
     --------------------------
-    TODO: Update App::Netflowd::Database to use SPM::Util functions
-    TODO: Finish App::Netflowd::Database, and use it in other code
-    TODO: Conver create_netflowd_db.sh to Perl.
+    * Make App::Netflowd::X, exception library for all of App::Netfowd
+    * Make App::Netflowd::Database, use exceptions
+    * Finish App::Netflowd::Database (final code review, write tests)
+    * Convert create_netflowd_db.sh to Perl.
     * Convert to a Perl module
     * Convert to Dist::Zilla
     * Fix unix_seconds in the headers_localtime view.

@@ -26,7 +26,7 @@ package SPM::Daemon;
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-use 5.016_001;
+use 5.16.1;
 use strict;
 use warnings;
 use English qw( -no_match_vars );
@@ -35,11 +35,11 @@ use POSIX qw(setsid WNOHANG);
 use Carp 'croak', 'cluck';   # TODO: should expections be used instead?
 use File::Basename;
 use IO::File;
-use Sys::Syslog qw(:DEFAULT setlogsock);
+use SPM::Syslog qw( close_syslog init_syslog log_info );
 require Exporter;
 
-our @ISA = qw(Exporter);
-our @EXPORT_OK = qw( init_server_root init_server_user log_debug log_die log_notice log_warn );
+our @ISA       = qw(Exporter);
+our @EXPORT_OK = qw( init_server_root init_server_user );
 our $VERSION   = '0.01';
 
 use constant PIDPATH  => '/var/run';
@@ -70,24 +70,9 @@ sub _change_privilages {
     $EFFECTIVE_USER_ID  = $uid;    # change the effective UID (but the the real UID)
 }
 
-sub _init_log {
-    setlogsock('unix');
-    my $basename = basename($PROGRAM_NAME);
-    openlog($basename, 'pid', FACILITY);
-    $SIG{__WARN__} = 'log_warn';    # send warn() messages to syslog
-    $SIG{__DIE__}  = 'log_die';     # send die() messages to syslog
-}
-
 sub _getpidfilename {
     my $basename = basename($PROGRAM_NAME, '.pl');
     return PIDPATH . "/$basename.pid";
-}
-
-sub _msg {
-    my $msg = join('', @_) || "Something's wrong";
-    my ($pack, $filename, $line) = caller(1);
-    $msg .= "$filename line $line\n" unless $msg =~ /\n$/;
-    return $msg;
 }
 
 sub _open_pid_file {
@@ -118,6 +103,7 @@ sub init_server_root {
         die "must run as root!";
     }
     $Pidfile  = shift;
+    my $syslog_mask = shift;
     if (!defined $Pidfile) {
         $Pidfile = _getpidfilename();
     }
@@ -125,7 +111,11 @@ sub init_server_root {
     _become_daemon();
     print $fh $PROCESS_ID;
     close $fh;
-    _init_log();
+
+    if (! defined $syslog_mask) {
+        $syslog_mask = 'info';
+    }
+    init_syslog($syslog_mask);
     return $Pid = $PROCESS_ID;
 }
 
@@ -133,9 +123,10 @@ sub init_server_user {
     if (!_running_as_root()) {
         die "must run as root!";
     }
-    $Pidfile  = shift;
-    my $user  = shift;
-    my $group = shift;
+    $Pidfile        = shift;
+    my $user        = shift;
+    my $group       = shift;
+    my $syslog_mask = shift;
     if (!defined $user && !defined $group) {
         die "cannot drop privilages, missing user or group parameter!";
     }
@@ -146,24 +137,21 @@ sub init_server_user {
     _become_daemon();
     print $fh $PROCESS_ID;
     close $fh;
-    _init_log();
+
+    if (! defined $syslog_mask) {
+        $syslog_mask = 'info';
+    }
+    init_syslog($syslog_mask);
     _change_privilages($user, $group);
     return $Pid = $PROCESS_ID;
 }
 
-sub log_die {
-    syslog('crit', _msg(@_));
-    die @_;
-}
-sub log_debug  { syslog('debug',   _msg(@_)) }
-sub log_notice { syslog('notice',  _msg(@_)) }
-sub log_warn   { syslog('warning', _msg(@_)) }
-
 END { 
     $EFFECTIVE_USER_ID = $REAL_USER_ID;     # regain root privilages
     if (defined $Pid && $Pid == $PID) {
-        log_notice("removing pidfile $Pidfile", "\n");
+        log_info("removing pidfile $Pidfile", "\n");
         unlink $Pidfile;
+        close_syslog();
     }
 }
 
@@ -176,11 +164,11 @@ SPM::Daemon - Functions For Perl Daemons
 
 =head1 SYNOPSIS
 
-  use SPM::Daemon qw( init_server log_debug log_die log_notice log_warn );
+  use SPM::Daemon qw( init_server_root init_server_user );
 
 =head1 DESCRIPTION
 
-The SPM::Daemon module contains functions to used for creating daemons.
+The SPM::Daemon module contains functions used for creating daemons.
 
 =head2 EXPORT
 
@@ -189,35 +177,21 @@ be explicitly requested.
 
 =head1 FUNCTIONS
 
-=head2 init_server_root(PIDFILE)
+=head2 init_server_root(PIDFILE, MASK)
 
 Do required work to become a daemon as root. Forks a new process, becomes the session leader, sets up syslog, clears environment variables,
-clears umask, and changes directory to /.
+clears umask, and changes directory to /. Sets syslog mask to I<MASK>. Valid syslog masks are 'debug', 'info', 'warning', 'err', and 'crit'.
+The I<MASK> parameter is optional. Default syslog I<MASK> is 'info'.
 
-=head2 init_server_user(PIDFILE, USER, GROUP)
+=head2 init_server_user(PIDFILE, USER, GROUP, MASK)
 
-Do required work to become a daemon as USER. Forks a new process, becomes the session leader, sets set syslog, clears environment variables,
-clears umask, and changes directory to /. Drops root privilages runs as user USER and group GROUP.
-
-=head2 log_debug
-
-Log a debug message to syslog.
-
-=head2 log_die
-
-Log a critical message to syslog and die.
-
-=head2 log_notice
-
-Log a notice message to syslog.
-
-=head2 log_warn
-
-Log a warning message to syslog.
+Do required work to become a daemon as I<USER>. Forks a new process, becomes the session leader, sets up syslog, clears environment variables,
+clears umask, and changes directory to /. Drops root privilages runs as user I<USER> and group I<GROUP>. Sets syslog mask to I<MASK>. Valid syslog masks
+are 'debug', 'info', 'warning', 'err', and 'crit'. The I<MASK> parameter is optional. Default syslog mask is 'info'.
 
 =head1 SEE ALSO
 
-Sys::Syslog, fork(), setsid()
+SPM::Syslog, fork(), setsid()
 
 =head1 BUGS
 
