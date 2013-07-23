@@ -20,7 +20,6 @@ Version 0.1 TODO List
     * Make App::Netflowd::X, exception library for all of App::Netfowd
     * Make App::Netflowd::Database, use exceptions
     * Finish App::Netflowd::Database (final code review, write tests)
-    * Convert create_netflowd_db.sh to Perl.
     * Convert to a Perl module
     * Convert to Dist::Zilla
     * Fix unix_seconds in the headers_localtime view.
