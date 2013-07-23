@@ -17,7 +17,6 @@ Version 0.1 TODO List
     
     App::Netflowd Module Tasks
     --------------------------
-    * Make App::Netflowd::X, exception library for all of App::Netfowd
     * Make App::Netflowd::Database, use exceptions
     * Finish App::Netflowd::Database (final code review, write tests)
     * Convert to a Perl module
