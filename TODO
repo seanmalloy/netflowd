@@ -17,8 +17,9 @@ Version 0.1 TODO List
     
     App::Netflowd Module Tasks
     --------------------------
-    * Make App::Netflowd::Database, use exceptions
-    * Finish App::Netflowd::Database (final code review, write tests)
+    * Review and test netflowd_util
+    * Write tests for App::Netflowd::Database
+    * Write tests for App::Netflowd::X::Database
     * Convert to a Perl module
     * Convert to Dist::Zilla
     * Fix unix_seconds in the headers_localtime view.

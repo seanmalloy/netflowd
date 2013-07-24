@@ -30,7 +30,7 @@ use 5.16.1;
 use strict;
 use warnings;
 use SPM::Util qw( is_defined isnt_reference );
-use SPM::X::BadValue;
+use App::Netflowd::X::Database;
 use SPM::Syslog qw( log_info );
 require Exporter;
 
@@ -41,54 +41,49 @@ our $VERSION   = '0.01';
 #############################################
 # Usage      : connect_netflowd_database('/path/to/db/file.db')
 # Purpose    : Creates SQLite database for netflowd(if necessary),
-#              verifies correctness of database, and connects to it
+#              connects to the database, and verifies correctness of database.
 # Returns    : DBI database handle
 # Parameters : Path to database file
-# Throws     : Various exceptions
+# Throws     : App::Netflowd::X::Database
 # Comments   : none
 # See Also   : DBI, DBD::SQLite
 sub connect_netflowd_database {
     my $database_file = shift;
     is_defined($database_file);
     isnt_reference($database_file);
-
-    if (! -f $database_file) {
-        _create_netflowd_database($database_file);  # TODO: check for failure
-    } else {
-        log_info("connecting to existing database $database_file", "\n");
-    }
-    verify_netflowd_database($database_file);  # TODO: check for failure
-    my $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
-
-    # TODO: should be exception
-    if (!defined $database_handle) {
-        log_die("cannot connect to database $database_file: $DBI::errstr");
-    }
+    my $database_handle = create_netflowd_database($database_file);
+    verify_netflowd_database($database_file);
     return $database_handle;
 }
 
 #############################################
 # Usage      : create_netflowd_database('/path/to/db/file.db')
 # Purpose    : creates SQLite database for netflowd
-# Returns    : True if successful
+# Returns    : DBI database handle if successful
 # Parameters : Path to database file
-# Throws     : Various exceptions
-# Comments   : Does nothing if database file already exists
+# Throws     : App::Netflowd::X::Database
+# Comments   : Only connects to database if database file already exists
 # See Also   : DBI, DBD::SQLite
 sub create_netflowd_database {
     my $database_file = shift;
     is_defined($database_file);
     isnt_reference($database_file);
 
+    my $database_handle;
     if (! -e $database_file) {
-        log_info("Creating new database $database_file", "\n");
         # Create database
-        my $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
+        log_info("Creating new database $database_file", "\n");
+        $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
 
-        # TODO: should be exception
         if (!defined $database_handle) {
-            #log_die("cannot connect to database $database_file: $DBI::errstr");
-            return;
+            App::Netflowd::X::Database->throw({
+                ident   => 'database connection',
+                tags    => [ qw(database connection) ],
+                public  => 1,
+                message => "cannot connect to database %{given_value}: %{given_for}",
+                given_value => $database_file,
+                given_for   => $DBI::errstr,
+            });
         }
 
         my $create_headers_table_sql = <<'END_SQL';
@@ -154,66 +149,141 @@ END_SQL
         FROM headers
 END_SQL
         $database_handle->do($create_local_time_view_sql);
-        $database_handle->disconnect;
+        return $database_handle;
+    } else {
+        # Database file already exists
+        log_info("Connecting to existing database $database_file", "\n");
+        $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
+        if (!defined $database_handle) {
+            App::Netflowd::X::Database->throw({
+                ident   => 'database connection',
+                tags    => [ qw(database connection) ],
+                public  => 1,
+                message => "cannot connect to database %{given_value}: %{given_for}",
+                given_value => $database_file,
+                given_for   => $DBI::errstr,
+            });
+        }
+        return $database_handle;
     }
-
-    # Database file already exists. Do nothing.
-    return 1;
 }
 
 #############################################
 # Usage      : verify_netflowd_database('/path/to/db/file.db')
 # Purpose    : verify correctness of Netflowd SQLite database
-# Returns    : True if successful. Undef or empty list on failute (TODO: update when code uses exceptions)
+# Returns    : True if successful.
 # Parameters : Path to database file
-# Throws     : Various exceptions
+# Throws     : App::Netflowd::X::Database
 # Comments   : none
 # See Also   : DBI, DBD::SQLite
 sub verify_netflowd_database {
     my $database_file = shift;
-    my $return_value  = 1;
     is_defined($database_file);
     isnt_reference($database_file);
 
-    if (! -f $database_file) {
-        # TODO: should be excpetion
-        return;
-    } else {
-        my $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
+    # Check for headers table
+    _table_exists($database_file, 'headers');
 
-        # TODO: should be excpetion
-        if (!defined $database_handle) {
-            #log_die("cannot connect to database $database_file: $DBI::errstr");
-            return;
-        }
+    # Check for flows table
+    _table_exists($database_file, 'flows');
 
-        # TODO: should be excpetion
-        # Check for headers table
-        if (scalar($database_handle->tables(undef, undef, 'headers', 'TABLE')) != 1) {
-            $return_value = 0;
-        }
+    # Check for headers_localtime view
+    _view_exists($database_file, 'headers_local_time');
 
-        # TODO: should be excpetion
-        # Check for flows table
-        if (scalar($database_handle->tables(undef, undef, 'flows' , 'TABLE')) != 1) {
-            $return_value = 0;
-        }
-
-        # TODO: should be excpetion
-        # Check for headers_localtime view
-        if (scalar($database_handle->tables(undef, undef, 'headers_localtime' , 'VIEW')) != 1) {
-            $return_value = 0;
-        }
-
-        # TODO: check version information
-        # TODO: check column type in each table and view
-        $database_handle->disconnect;
-    }
-    
-    if ($return_value == 0) {
-        return;
-    }
+    # TODO: check version information
+    # TODO: check column type in each table and view
     return 1;
+}
+
+#############################################
+# Usage      : _table_exists('/path/to/db/file.db', table)
+# Purpose    : Check if a database table exists in a SQLite database
+# Returns    : True if table exists
+# Parameters : Path to database file, table name
+# Throws     : App::Netflowd::X::Database
+# Comments   : Internal use only
+# See Also   : DBI, DBD::SQLite
+sub _table_exists {
+    my $database_file = shift;
+    my $table         = shift;
+
+    is_defined($database_file);
+    isnt_reference($database_file);
+    is_defined($table);
+    isnt_reference($table);
+
+    my $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
+    if (!defined $database_handle) {
+        App::Netflowd::X::Database->throw({
+            ident   => 'database connection',
+            tags    => [ qw(database connection) ],
+            public  => 1,
+            message => "cannot connect to database %{given_value}: %{given_for}",
+            given_value => $database_file,
+            given_for   => $DBI::errstr,
+        });
+    }
+
+    if (scalar($database_handle->tables(undef, undef, 'headers', 'TABLE')) == 1) {
+        $database_handle->disconnect;
+        return 1;
+    } else {
+        $database_handle->disconnect;
+        App::Netflowd::X::Database->throw({
+            ident   => 'database table does not exist',
+            tags    => [ qw(database table) ],
+            public  => 1,
+            message => "table %{given_for} does not exist in %{given_value}",
+            given_value => $database_file,
+            given_for   => $table,
+        });
+    }
+}
+
+#############################################
+# Usage      : _view_exists('/path/to/db/file.db', view)
+# Purpose    : Check if a database view exists in a SQLite database
+# Returns    : True if view exists
+# Parameters : Path to database file, view name
+# Throws     : App::Netflowd::X::Database
+# Comments   : Internal use only
+# See Also   : DBI, DBD::SQLite
+sub _view_exists {
+    my $database_file = shift;
+    my $view          = shift;
+
+    is_defined($database_file);
+    isnt_reference($database_file);
+    is_defined($view);
+    isnt_reference($view);
+
+    my $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
+    if (!defined $database_handle) {
+        App::Netflowd::X::Database->throw({
+            ident   => 'database connection',
+            tags    => [ qw(database connection) ],
+            public  => 1,
+            message => "cannot connect to database %{given_value}: %{given_for}",
+            given_value => $database_file,
+            given_for   => $DBI::errstr,
+        });
+    }
+
+    if (scalar($database_handle->tables(undef, undef, 'headers', 'VIEW')) == 1) {
+        $database_handle->disconnect;
+        return 1;
+    } else {
+        $database_handle->disconnect;
+        App::Netflowd::X::Database->throw({
+            ident   => 'database view does not exist',
+            tags    => [ qw(database view) ],
+            public  => 1,
+            message => "view %{given_for} does not exist in %{given_value}",
+            given_value => $database_file,
+            given_for   => $view,
+        });
+    }
+
 }
 
 1;
@@ -248,8 +318,8 @@ I<FILE>. Returns a DBD connection to the database.
 
 =head2 create_netflowd_database(I<FILE>)
 
-Creates SQLite netflowd database I<FILE>. Does nothing
-if I<FILE> already exists.
+Creates SQLite netflowd database I<FILE> if it does not
+already exist. Returns a DBD connection to the database.
 
 =head2 verify_netflowd_database(I<FILE>)
 
@@ -268,7 +338,7 @@ No known bugs at this time.
 
 =head1 AUTHOR
 
-Sean Malloy, E<lt>spinelli85@gmail.com@E<gt>
+Sean Malloy, E<lt>spinelli85@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
