@@ -130,25 +130,19 @@ END_SQL
         )
 END_SQL
         $database_handle->do($create_flows_table_sql);
-
-        # Create Database Views
-        my $create_local_time_view_sql = <<'END_SQL';
-        -- View for local time zone
-        CREATE VIEW IF NOT EXISTS headers_localtime AS
-        SELECT header_id,
-            version,
-            count,
-            system_uptime,
-            datetime(unix_seconds, 'unixepoch', 'localtime'),
-            unix_nano_seconds,
-            flow_sequence,
-            engine_type,
-            engine_id,
-            sampling_mode,
-            sampling_interval
-        FROM headers
+        
+        my $create_metadata_table_sql = <<'END_SQL';
+        -- Table for metadata
+        CREATE TABLE IF NOT EXISTS metadata (
+            version            FLOAT   NOT NULL PRIMARY KEY,  -- Database version
+            creation_time      INTEGER NOT NULL               -- Database creation time (seconds since 0000 UTC 1970)
+        )
 END_SQL
-        $database_handle->do($create_local_time_view_sql);
+        $database_handle->do($create_metadata_table_sql);
+
+        my $creation_time = time;
+        $database_handle->do("INSERT INTO metadata(version, creation_time) VALUES ($VERSION, $creation_time)");
+
         return $database_handle;
     } else {
         # Database file already exists
@@ -181,18 +175,78 @@ sub verify_netflowd_database {
     is_defined($database_file);
     isnt_reference($database_file);
 
-    # Check for headers table
+    # Check for tables
     _table_exists($database_file, 'headers');
-
-    # Check for flows table
     _table_exists($database_file, 'flows');
+    _table_exists($database_file, 'metadata');
 
-    # Check for headers_localtime view
-    _view_exists($database_file, 'headers_local_time');
+    # Check module version against version in database
+    _check_db_version($database_file, $VERSION);
 
-    # TODO: check version information
-    # TODO: check column type in each table and view
     return 1;
+}
+
+#############################################
+# Usage      : _check_db_version('/path/to/db/file.db', version)
+# Purpose    : Check database version 
+# Returns    : True if version matches
+# Parameters : Path to database file, version
+# Throws     : App::Netflowd::X::Database
+# Comments   : Internal use only
+# See Also   : DBI, DBD::SQLite
+sub _check_db_version {
+    my $database_file = shift;
+    my $given_version = shift;
+
+    is_defined($database_file);
+    isnt_reference($database_file);
+    is_defined($given_version);
+    isnt_reference($given_version);
+
+    my $database_handle = DBI->connect("dbi:SQLite:dbname=$database_file", "", "", { AutoCommit => 1, RaiseError => 1 } );
+    if (!defined $database_handle) {
+        App::Netflowd::X::Database->throw({
+            ident   => 'database connection',
+            tags    => [ qw(database connection) ],
+            public  => 1,
+            message => "cannot connect to database %{given_value}: %{given_for}",
+            given_value => $database_file,
+            given_for   => $DBI::errstr,
+        });
+    }
+
+    # Must have at least one row in metadata table
+    my @metadata_rows = $database_handle->selectrow_array("SELECT count(*) from metadata AS cnt");
+    my $row_count     = $metadata_rows[0];
+    if ($row_count < 1) {
+        $database_handle->disconnect;
+        App::Netflowd::X::Database->throw({
+            ident   => 'database version error',
+            tags    => [ qw(database version) ],
+            public  => 1,
+            message => "cannot determine version number in %{given_for}",
+            given_value => $given_version,
+            given_for   => $database_file,
+        });
+    }
+
+    my @version_rows     = $database_handle->selectrow_array("SELECT max(version) from metadata");
+    my $database_version = $version_rows[0];
+
+    if ($given_version == $database_version) {
+        $database_handle->disconnect;
+        return 1;
+    } else {
+        $database_handle->disconnect;
+        App::Netflowd::X::Database->throw({
+            ident   => 'database version mismatch',
+            tags    => [ qw(database version) ],
+            public  => 1,
+            message => "version %{given_value} does not match version in %{given_for}",
+            given_value => $given_version,
+            given_for   => $database_file,
+        });
+    }
 }
 
 #############################################
@@ -224,7 +278,7 @@ sub _table_exists {
         });
     }
 
-    if (scalar($database_handle->tables(undef, undef, 'headers', 'TABLE')) == 1) {
+    if (scalar($database_handle->tables(undef, undef, $table, 'TABLE')) == 1) {
         $database_handle->disconnect;
         return 1;
     } else {
@@ -269,7 +323,7 @@ sub _view_exists {
         });
     }
 
-    if (scalar($database_handle->tables(undef, undef, 'headers', 'VIEW')) == 1) {
+    if (scalar($database_handle->tables(undef, undef, $view, 'VIEW')) == 1) {
         $database_handle->disconnect;
         return 1;
     } else {

@@ -17,12 +17,10 @@ Version 0.1 TODO List
     
     App::Netflowd Module Tasks
     --------------------------
+    * START: Write tests for App::Netflowd::Database
     * Review and test netflowd_util
-    * Write tests for App::Netflowd::Database
     * Convert to a Perl module
     * Convert to Dist::Zilla
-    * Fix unix_seconds in the headers_localtime view.
-    * Store netflowd version information in SQLite database
     * Create database tests.
     * Use Pod::Weaver
 
