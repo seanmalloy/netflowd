@@ -1,11 +1,5 @@
 Version 0.1 TODO List
 ---------------------
-    NetFlow Module Tasks
-    --------------------
-    * START1: Move this to a separate git repo.
-    * Test Netflow::Parser module on little and big
-      endian architectures.
-    * Use Pod::Weaver
 
     App::Netflowd Module Tasks
     --------------------------
